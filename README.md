@@ -14,6 +14,8 @@ Coding agents are already good at one thing: reading and writing files. So inste
 
 The tradeoff is that it doesn't scale to a team, and it's not trying to. This is a memory system for one person and their agent.
 
+If you arrived here comparing this to something specific (Obsidian, ChatGPT's memory, just using Claude Code bare, OpenClaw, Hermes), **[guides/comparisons.md](guides/comparisons.md)** takes each one honestly, including what they do better.
+
 ## The design, briefly
 
 Memory here splits into three layers because they answer three different questions and change at three different speeds:

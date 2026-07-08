@@ -35,6 +35,6 @@ If you ever want to loosen this for a specific case ("you can accept calendar in
 
 ## Connectors and skills
 
-A connector is a capability; a **skill** is a written recipe for using it the same way every time. The first one most people end up wanting is inbox triage: "go through my email, list the threads waiting on me, draft replies for the routine ones, send nothing." Once you've asked for something like that twice, have the agent write it down as `skills/inbox-triage/SKILL.md` per your skills/README, and from then on "do my email" means the same reliable thing in every session.
+A connector is a capability; a **skill** is a written recipe for using it the same way every time. The first one most people end up wanting is inbox triage: "go through my email, list the threads waiting on me, draft replies for the routine ones, send nothing." A ready-made version ships with this starter at `templates/skills/inbox-triage/SKILL.md`; once email is connected and you've actually wanted this, ask the agent to install it into your HQ's `skills/` folder, and from then on "do my email" means the same reliable thing in every session. It's also worth reading as a model: the classify-then-draft workflow, the read-only rule, and the guardrails are the shape every good integration skill has.
 
 That's the pattern for every app you connect: use it conversationally first, and when a request becomes a repeat, make it a skill.

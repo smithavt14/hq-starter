@@ -228,6 +228,15 @@ is, you're comfortable with git as a concept. For "mixed — layered" positionin
 > addition: "Apps & connectors" block in Step 1, referenced by Step 8. First-week +
 > troubleshooting FAQ: `guides/first-week.md`, linked first from the README's After-setup
 > section. Remaining open items are the P2 row.
+>
+> **Status 2026-07-08 (third pass):** the P2 row shipped; the roadmap is complete. Worked
+> integration skill: `templates/skills/inbox-triage/SKILL.md` (read-only, deliberately not
+> installed at bootstrap; wired into AGENTS.md Step 5 and connect-your-apps.md). Schema
+> polish: `source` + `relatedEntities` added to the items.json schema with an extensibility
+> note. Polish batch: absolute-dates and `## Checkpoint` conventions in the memory/README
+> template, bucket-flexibility note in PARA_GUIDE, a "Repo hygiene" section in the manual
+> template, and a deferred `.claude/launch.json` note in the MAP.md step. (The
+> commit-message convention shipped earlier, inside the P0 session-wrap skill.)
 
 | P | Item | Dimension | Effort |
 |---|---|---|---|

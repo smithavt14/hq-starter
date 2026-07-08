@@ -211,6 +211,11 @@ Code and project files live outside this repo. This is the pointer index.
 
 Update this only when a project's status actually changes, not on every session.
 
+Optional, for later, power users only: once sessions are repeatedly launching the same dev
+servers, a `.claude/launch.json` (one entry per project: name, command, args, port) gives
+every future session a registry of how to run each one instead of rediscovering it. Don't
+create it at bootstrap; add it when the relaunching pattern actually appears.
+
 ### 3d. `CLAUDE.md` / `AGENTS.md`: the operating manual (written last, references the above)
 
 ```markdown
@@ -296,6 +301,11 @@ file's current state before editing it; another concurrent session may have chan
 Real project code lives outside this repo. See `MAP.md`. Read a project's own
 README/CLAUDE.md before working in it.
 
+## Repo hygiene
+Artifacts (screenshots, exports, generated files) never land in the repo root. If one
+belongs in HQ at all, it goes in a `files/` folder inside the relevant vault entity. The
+root stays what it is now: the manual, the identity files, MAP, TASKS, and nothing else.
+
 ## Skills
 `skills/<name>/SKILL.md` defines a reusable capability. Build one when a recurring action
 shows up at least twice, not for one-off tasks.
@@ -317,7 +327,12 @@ One file per day: `YYYY-MM-DD.md`. Append-only within a day. Written for a cold 
 - Topic-level headers for each thread of activity.
 - Explicit file paths, not vague references.
 - Decision + rationale, not just outcome.
-- End each session's entry with a numbered resume-point list: what to pick up next.
+- Absolute dates, never relative: "today" becomes the actual date, "next Friday" a real one.
+  A cold reader weeks later can't resolve "tomorrow."
+- When context fills mid-task, write a `## Checkpoint` section before anything is lost:
+  current state, what's done, what's not.
+- End each session's entry with a numbered resume-point list: what to pick up next, with the
+  exact pause point (where work stopped and the next concrete action).
 
 Durable facts get promoted out of here into `vault/` entities. Don't rely on old daily logs
 being re-read to reconstruct facts. If it's durable, it belongs in the vault too.
@@ -368,6 +383,11 @@ Ask, in order:
 One entity, one home. If something spans two, pick the bucket for its *primary* nature and
 cross-link from the other.
 
+The four buckets are a default, not a straitjacket. When a real category of content clearly
+isn't any of them (one live HQ added `writing/` for essays and drafts), add a top-level
+bucket and a row group in `index.md`. Do it when actual content demands it, never
+speculatively.
+
 ## Entity format
 Most entities are a folder: `vault/<bucket>/<entity-name>/`
 ```
@@ -390,6 +410,8 @@ Append-only array. Never delete an entry: supersede it.
     "date": "YYYY-MM-DD",
     "category": "role | preference | decision | relationship | event | ...",
     "fact": "one atomic, verifiable statement",
+    "source": "conversation | email | document | inference",
+    "relatedEntities": [],
     "status": "active | superseded",
     "supersededBy": null,
     "privacy": "normal | sensitive"
@@ -398,8 +420,18 @@ Append-only array. Never delete an entry: supersede it.
 ```
 - `status: superseded` facts stay in the log forever. They're history, just not current truth.
 - `summary.md` reflects only `active` facts by default.
+- `source` records where a fact came from, so its reliability can be judged later.
+  `inference` (concluded, not stated) is the one to be honest about.
+- `relatedEntities` lists the folder names of other vault entities a fact involves
+  (e.g. a fact about a person can reference the project you met them through). This is what
+  makes the vault a graph instead of isolated notes: grepping an entity's name surfaces
+  facts about it filed elsewhere. Leave it `[]` when a fact involves no one else.
 - `privacy: sensitive` marks things like health/financial/legal facts: handle with the same
   care as SOUL.md hard lines dictate for external actions.
+- The schema is extensible: add fields when a real need appears (one live HQ added
+  access-tracking fields to prepare for summary decay). Adding a field to new entries is
+  cheap and old entries don't need backfilling; renaming or removing one is churn. Don't
+  add speculatively.
 
 ## No-deletion rule
 Never delete a fact. Correct forward: add a new entry, mark the old one superseded, point
@@ -503,7 +535,12 @@ session. It is the executable form of the Step 7 session-end procedure; any "wra
 disk, reconstruct the skill from Step 7 instead of skipping it.
 
 Every *other* skill waits until its need has actually recurred (per the bar in the README
-above). Don't seed the folder with speculative capabilities.
+above). Don't seed the folder with speculative capabilities. That includes the starter's
+second template, `templates/skills/inbox-triage/SKILL.md`: it's the worked example of an
+integration skill (read-only email triage over a connector), and it's deliberately **not**
+installed at bootstrap, since no connector exists yet. Install it (filling `{{name}}`) only
+once email is connected and the user has actually asked for triage; until then it's
+reference material for what a good integration skill looks like.
 
 ### `TASKS.md`
 ```markdown

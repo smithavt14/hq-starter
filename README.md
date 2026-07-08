@@ -65,6 +65,7 @@ USER.md             : who you are, corrected over time, not written once
 MAP.md              : where your actual project code lives
 vault/              : durable facts about people, projects, companies, areas of life
 memory/             : one file per day, a raw timeline of what happened
+journal/            : the agent's own occasional reflections, where its voice evolves from
 skills/             : reusable recipes for things you ask the agent to do repeatedly
                       (a session-wrap checkpoint skill is installed from day one)
 TASKS.md            : what's actually in flight right now
@@ -74,14 +75,17 @@ Start a new session cold, weeks later, with no conversation history, and the age
 
 It won't be complete after setup. The vault starts with a handful of real entities, not your whole life pre-loaded. You build it out by using the thing, the same way you'd build out any notes system. That's on purpose. Guessing your whole world upfront produces plausible-sounding filler; using it for real produces facts you actually meant to record.
 
-## After setup: two upgrades worth knowing about
+## After setup
 
-Once the basic rhythm is running (a few days of sessions, some real memory on disk), two additions turn the memory system into something closer to an assistant:
+Start with **[Your first week](guides/first-week.md)**: what the first days should look like, how to tell the system is actually working, and a plain-words fix for everything that commonly looks broken (cold starts, wrong facts, rejected pushes).
+
+Then, once the basic rhythm is running, three additions turn the memory system into something closer to an assistant:
 
 - **[Connect your apps](guides/connect-your-apps.md)**: plug in calendar, email, and documents so the agent can see the parts of your life that don't live in files. Plain-language guide, including the rule that keeps it safe (seeing is free, acting always requires your confirmation).
 - **[Make it proactive](guides/proactive.md)**: a daily morning briefing (calendar, threads waiting on you, yesterday's roundup, today's priorities), how to schedule it, its honest limitations, and the read-only rule every scheduled task should follow.
+- **[Your HQ everywhere](guides/your-hq-everywhere.md)**: the private GitHub remote, hand-held; the pull/push rhythm that keeps machines in sync; what to say when git complains; and using your HQ from the web or your phone.
 
-Neither is required. Both are where the "companion" part starts to show.
+None of these are required. They're where the "companion" part starts to show.
 
 ## Honest caveats
 

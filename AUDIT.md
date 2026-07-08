@@ -218,6 +218,16 @@ is, you're comfortable with git as a concept. For "mixed — layered" positionin
 > `templates/skills/session-wrap/SKILL.md`, installed by AGENTS.md Step 5. Proactive doc:
 > `guides/proactive.md`. Connectors doc: `guides/connect-your-apps.md`. Nontechnical
 > quickstart + glossary: README, plus a new AGENTS.md Step 8 pointing users at the guides.
+>
+> **Status 2026-07-08 (second pass):** the five P1 items shipped. Sync guide:
+> `guides/your-hq-everywhere.md`, plus a "Syncing, other machines, and concurrent sessions"
+> section (worktree escape hatch, re-read-before-edit) in the operating-manual template and
+> a hand-held-remote pointer in Step 1. TASKS.md format guidance: Step 5 template now
+> teaches This-week/Open, delete-when-done, and context-loaded items. journal/ layer: Step 2
+> tree, Step 4a README template, and a note in the manual template's memory model. Interview
+> addition: "Apps & connectors" block in Step 1, referenced by Step 8. First-week +
+> troubleshooting FAQ: `guides/first-week.md`, linked first from the README's After-setup
+> section. Remaining open items are the P2 row.
 
 | P | Item | Dimension | Effort |
 |---|---|---|---|

@@ -51,6 +51,12 @@ Run this before writing any content file. Keep it short. These files get correct
 - Key companies/organizations they're part of or deal with regularly.
 - Any recurring commitments or areas of ongoing responsibility (health, finances, a community they're part of, pets, etc.) worth a vault folder from day one.
 
+**Apps & connectors**
+- Which apps should the companion eventually be able to see: email, calendar, documents,
+  notes, anything else? Capture the answer (it informs `USER.md` and gets mentioned again in
+  Step 8), but do **not** set up any connectors during bootstrap. Connecting works better as
+  a deliberate step against a live system; the walkthrough is `guides/connect-your-apps.md`.
+
 **How they want the agent to work**
 - Desired tone/vibe (a handful of adjectives, or "talk like X").
 - Any phrasing or habits to explicitly avoid (e.g. "no corporate enthusiasm," "don't hedge," "no emoji").
@@ -61,7 +67,7 @@ Run this before writing any content file. Keep it short. These files get correct
 
 **Memory logistics**
 - Confirm where their real project code lives (used to finalize `.claude/settings.json` and `MAP.md`).
-- Ask whether they want this synced to a git remote. If yes, the remote **must be private**. This repo will hold personal, and possibly sensitive, information about them. Create it explicitly private, e.g. `gh repo create <name> --private --source . --remote origin`, or create a private repo in the GitHub UI and `git remote add origin <url>`. Never push this to a public remote.
+- Ask whether they want this synced to a git remote. If yes, the remote **must be private**. This repo will hold personal, and possibly sensitive, information about them. Create it explicitly private, e.g. `gh repo create <name> --private --source . --remote origin`, or create a private repo in the GitHub UI and `git remote add origin <url>`. Never push this to a public remote. If the user isn't comfortable with git or GitHub, walk them through the hand-held path in `guides/your-hq-everywhere.md`, and verify the `Private` badge together before the first push.
 
 **Before leaving Step 1, do these now, don't defer:**
 - Edit `.claude/settings.json` and replace the `~/Workspace` placeholder with the real code path(s) you just confirmed. Add multiple array entries if the code lives in more than one root. A wrong or placeholder path here means future sessions silently can't read their project files.
@@ -83,6 +89,8 @@ hq/
 ├── .claude/
 │   └── settings.json
 ├── memory/
+│   └── README.md
+├── journal/
 │   └── README.md
 ├── vault/
 │   ├── index.md
@@ -239,6 +247,11 @@ PARA + tiered recall. Files are the source of truth; a hand-maintained index giv
 | Daily / episodic | `memory/YYYY-MM-DD.md` | Raw timeline: what happened, decisions, checkpoints | Continuously, during sessions |
 | Tacit knowledge | `SOUL.md`, `USER.md` | How {{name}} operates, who I am | Rarely, on a real pattern |
 
+`journal/` sits alongside the tacit layer: my own occasional reflections on how the
+collaboration is going, one dated file per entry, written when there's something real to
+say. `memory/` records {{name}}'s timeline; `journal/` records mine. SOUL.md revisions
+should trace back to patterns first noticed there.
+
 PARA buckets in `vault/`: `projects/` (has a finish line), `areas/` (ongoing responsibilities:
 people, companies, recurring commitments), `resources/` (reference topics),
 `archives/` (inactive). Entity format and fact schema: `vault/PARA_GUIDE.md`. Start from
@@ -270,6 +283,14 @@ concept-level matches. Non-destructive when added, files stay the source of trut
 - External (sending email/messages, posting publicly, speaking as {{name}}, anything others
   see): always draft first, confirm before sending. See SOUL.md → Hard lines for specifics
   on which channels need this.
+
+## Syncing, other machines, and concurrent sessions
+This repo may be opened from another machine, Claude Code on the web, or a phone. The
+startup `git pull` and the end-of-session push are what keep all of them coherent; never
+skip either. If a push is rejected, `git pull --rebase` and retry.
+If a session is ever spawned into an isolated git worktree (`.claude/worktrees/<name>`),
+ignore the worktree: read, write, and commit against the real repo as normal. Re-read a
+file's current state before editing it; another concurrent session may have changed it.
 
 ## Projects & file access
 Real project code lives outside this repo. See `MAP.md`. Read a project's own
@@ -313,6 +334,24 @@ Create today's file with a minimal header so the pattern exists:
 ### Resume point
 1. Operate normally: write daily notes here, promote durable facts to vault/ as they come up.
 ```
+
+Also create `journal/README.md`. This is a separate space from `memory/`, and the
+distinction matters: memory/ is where the agent logs, journal/ is where it thinks.
+
+```markdown
+# journal/: the agent's own reflections
+
+`memory/` is the factual timeline of {{name}}'s life and work. This is different: it's
+where I reflect. What I'm learning about how to work with {{name}}, where my identity is
+heading, what felt off or right.
+
+One file per entry: `YYYY-MM-DD.md`. Written occasionally, when there's something real to
+say, not every session. Over time, this is where SOUL.md revisions actually come from: a
+pattern gets noticed here first, and only once it's held up does it change SOUL.md.
+```
+
+Leave `journal/` empty beyond the README. Entries can't be scheduled into existence; the
+first one happens when there's genuinely something to reflect on.
 
 ### 4b. `vault/PARA_GUIDE.md`: the spec every future vault write follows
 
@@ -470,9 +509,22 @@ above). Don't seed the folder with speculative capabilities.
 ```markdown
 # Tasks
 
-(empty: populate as real work starts; completed items are deleted, not checked off, git
-history is the archive)
+Flat queue. Delete a task when done (git history is the archive). Newest context wins.
+
+## This week
+(2-4 goals actually committed to, set at the start of each week. Not a wish list.)
+
+## Open
+(everything else genuinely in flight; group under ### area headings once it grows)
 ```
+
+Leave both sections empty at bootstrap; they populate as real work starts. But teach the
+task-writing rule now, because it's what makes the file useful across sessions: **every
+item carries enough context that a cold session can act from the item alone**: file paths,
+current state, the next concrete step, any blocker. When work advances, rewrite the item
+in place (newest context wins) rather than appending a vague new one. "Finish the website"
+is a wish; "deploy `~/sites/foo`: DNS is set, `npm run build` fails on the image step, fix
+that then run the deploy" is resumable.
 
 ### `scripts/README.md`
 ```markdown
@@ -559,15 +611,21 @@ items (search index, automated extraction, decay) per the triggers stated in
 
 ## Step 8: Point the user onward (don't build these now)
 
-Bootstrap ends here. Before you close, tell the user, briefly, that two upgrades exist for
-later, both documented in this starter repo's `guides/` folder:
+Bootstrap ends here. Before you close, point the user, briefly, at the starter repo's
+`guides/` folder:
 
-1. **Connecting apps** (`guides/connect-your-apps.md`): calendar, email, and documents via
+1. **What the first week looks like** (`guides/first-week.md`): day-by-day expectations
+   and a plain-words troubleshooting FAQ. Worth reading right away; it sets the "the vault
+   grows through use" expectation that prevents day-two abandonment.
+2. **Connecting apps** (`guides/connect-your-apps.md`): calendar, email, and documents via
    connectors, which is where the assistant behaviors (meeting prep, "who's waiting on me")
-   come from. Worth doing within the first week.
-2. **A proactive morning briefing** (`guides/proactive.md`): a scheduled daily read-only
+   come from. Reference the specific apps they named in the Step 1 interview. Worth doing
+   within the first week.
+3. **A proactive morning briefing** (`guides/proactive.md`): a scheduled daily read-only
    report. Worth doing only after a few days of real use, once memory/ and TASKS.md have
    content to brief from.
+4. **Sync, phone, and web access** (`guides/your-hq-everywhere.md`): only if they set up a
+   remote (or wished they could have) in Step 1, or when git friction first appears.
 
 Mention them once and stop. Do not set up connectors or scheduled tasks during bootstrap:
 both work better as deliberate choices made against a live system, and scheduled anything

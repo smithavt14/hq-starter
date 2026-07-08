@@ -214,6 +214,11 @@ is, you're comfortable with git as a concept. For "mixed — layered" positionin
 
 ## Prioritized roadmap
 
+> **Status 2026-07-08:** the four P0 items shipped in a first pass. Session-wrap skill:
+> `templates/skills/session-wrap/SKILL.md`, installed by AGENTS.md Step 5. Proactive doc:
+> `guides/proactive.md`. Connectors doc: `guides/connect-your-apps.md`. Nontechnical
+> quickstart + glossary: README, plus a new AGENTS.md Step 8 pointing users at the guides.
+
 | P | Item | Dimension | Effort |
 |---|---|---|---|
 | **P0** | Ship generalized `session-wrap` skill in the starter | Session hygiene, sync | S |

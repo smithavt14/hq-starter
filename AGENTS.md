@@ -93,7 +93,9 @@ hq/
 │   ├── resources/
 │   └── archives/
 ├── skills/
-│   └── README.md
+│   ├── README.md
+│   └── session-wrap/
+│       └── SKILL.md
 └── scripts/
     └── README.md
 ```
@@ -440,6 +442,8 @@ Use only real information from the interview. Do not batch-generate placeholder 
 it correctly with zero prior context.
 
 Bar for creating one: the action has recurred at least twice. Not for one-off tasks.
+One exception ships pre-installed: `session-wrap/`, the end-of-session checkpoint.
+Every HQ needs it from the first session, so it doesn't wait for recurrence.
 
 ## SKILL.md shape
 - YAML frontmatter: name, and a description dense with trigger phrases the agent should
@@ -450,9 +454,17 @@ Bar for creating one: the action has recurred at least twice. Not for one-off ta
 - Guardrails: known failure modes, especially over-application.
 ```
 
-Write one real example skill only once a recurring need actually appears (e.g. a session-wrap
-checkpoint ritual, once the user has ended a few sessions and you've noticed the same
-checkpoint steps repeating).
+**Install the session-wrap skill now.** Copy `templates/skills/session-wrap/SKILL.md` from
+this starter repo to `<hq>/skills/session-wrap/SKILL.md`, replacing every `{{name}}` with the
+user's name. This is the one skill that doesn't wait for a recurring need: the end-of-session
+checkpoint (log → promote facts → update tasks → flag stragglers → commit → push) is the
+mechanism that keeps memory and cross-machine sync intact, and it's needed from the very first
+session. It is the executable form of the Step 7 session-end procedure; any "wrap up" /
+"let's stop here" signal from the user should trigger it. If the starter repo is no longer on
+disk, reconstruct the skill from Step 7 instead of skipping it.
+
+Every *other* skill waits until its need has actually recurred (per the bar in the README
+above). Don't seed the folder with speculative capabilities.
 
 ### `TASKS.md`
 ```markdown
@@ -521,6 +533,9 @@ These are not one-time steps. They are the operating rhythm from here on.
   SOUL.md hard lines.
 
 ### Session end / context filling (session-wrap habit)
+The `skills/session-wrap/SKILL.md` installed in Step 5 is the executable form of this list;
+any "wrap up" / "checkpoint" / "let's stop here" signal should trigger it. The steps, for
+reference:
 1. Append the day's state to `memory/YYYY-MM-DD.md`: what happened, decisions made and why,
    anything flagged for follow-up.
 2. Sweep for durable facts surfaced this session that haven't been promoted to `vault/` yet:
@@ -539,3 +554,22 @@ These are not one-time steps. They are the operating rhythm from here on.
 Once this rhythm has run for real for a few weeks, and only then, revisit Step 4's deferred
 items (search index, automated extraction, decay) per the triggers stated in
 `vault/resources/memory-architecture.md`.
+
+---
+
+## Step 8: Point the user onward (don't build these now)
+
+Bootstrap ends here. Before you close, tell the user, briefly, that two upgrades exist for
+later, both documented in this starter repo's `guides/` folder:
+
+1. **Connecting apps** (`guides/connect-your-apps.md`): calendar, email, and documents via
+   connectors, which is where the assistant behaviors (meeting prep, "who's waiting on me")
+   come from. Worth doing within the first week.
+2. **A proactive morning briefing** (`guides/proactive.md`): a scheduled daily read-only
+   report. Worth doing only after a few days of real use, once memory/ and TASKS.md have
+   content to brief from.
+
+Mention them once and stop. Do not set up connectors or scheduled tasks during bootstrap:
+both work better as deliberate choices made against a live system, and scheduled anything
+must follow the read-only rule in `guides/proactive.md`. If the user says "let's do it now,"
+follow the relevant guide.

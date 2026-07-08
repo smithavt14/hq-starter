@@ -36,6 +36,24 @@ Everything else in the repo (the operating manual, the task list, the skills con
 
 That's it. No config file to hand-edit first, no accounts to create. The interview is intentionally short. These files are meant to be corrected over time, not gotten right on day one.
 
+### Never used a terminal?
+
+You don't need to be a developer for any of this. The realistic minimum:
+
+1. Install [Claude Code](https://claude.com/claude-code). The desktop app counts; you never have to touch a raw terminal window if you don't want to.
+2. Download this repo (the green "Code" button on GitHub → "Download ZIP" works fine if "clone" means nothing to you) and open that folder in Claude Code.
+3. Type: **"Read AGENTS.md and set up my HQ."**
+
+From there the agent does every technical step itself: creating folders, writing files, running git. Your job is answering questions about your life, and saying yes or no. If anything ever looks broken, describe what you see in plain words ("it says the push was rejected") and ask the agent to fix it. That is a normal and correct way to operate this system, not a workaround.
+
+Five terms you'll see, so nothing reads as magic:
+
+- **Repo**: a folder whose entire history is tracked. Your HQ is one.
+- **Commit**: a saved snapshot of that folder, with a note about what changed.
+- **Push / pull**: send your snapshots to an online copy / fetch snapshots made elsewhere. This is how your HQ syncs across machines.
+- **Remote**: that online copy, typically a *private* GitHub repository.
+- **Connector (MCP)**: a plug that lets the agent see one of your apps, like email or calendar. See [guides/connect-your-apps.md](guides/connect-your-apps.md).
+
 ## What you end up with
 
 A git repo that looks roughly like this:
@@ -48,12 +66,22 @@ MAP.md              : where your actual project code lives
 vault/              : durable facts about people, projects, companies, areas of life
 memory/             : one file per day, a raw timeline of what happened
 skills/             : reusable recipes for things you ask the agent to do repeatedly
+                      (a session-wrap checkpoint skill is installed from day one)
 TASKS.md            : what's actually in flight right now
 ```
 
 Start a new session cold, weeks later, with no conversation history, and the agent should still know who you are, what you're mid-project on, and how you like to work, because it read the files instead of relying on you to re-explain.
 
 It won't be complete after setup. The vault starts with a handful of real entities, not your whole life pre-loaded. You build it out by using the thing, the same way you'd build out any notes system. That's on purpose. Guessing your whole world upfront produces plausible-sounding filler; using it for real produces facts you actually meant to record.
+
+## After setup: two upgrades worth knowing about
+
+Once the basic rhythm is running (a few days of sessions, some real memory on disk), two additions turn the memory system into something closer to an assistant:
+
+- **[Connect your apps](guides/connect-your-apps.md)**: plug in calendar, email, and documents so the agent can see the parts of your life that don't live in files. Plain-language guide, including the rule that keeps it safe (seeing is free, acting always requires your confirmation).
+- **[Make it proactive](guides/proactive.md)**: a daily morning briefing (calendar, threads waiting on you, yesterday's roundup, today's priorities), how to schedule it, its honest limitations, and the read-only rule every scheduled task should follow.
+
+Neither is required. Both are where the "companion" part starts to show.
 
 ## Honest caveats
 

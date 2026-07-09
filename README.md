@@ -14,13 +14,13 @@ Three ways in, depending on who you are:
 
 All sections:
 
-1. [What this gets you](#what-this-gets-you) — why bother, in terms of things you can actually ask for
-2. [Quick start](#quick-start) — three steps, one pasted prompt
-   - [If you've never used a terminal](#if-youve-never-used-a-terminal) — reassurance and a five-term glossary
-3. [What setup creates](#what-setup-creates) — the folder you end up with, file by file
-4. [After setup](#after-setup) — the guides: first week, apps, proactivity, sync and phone
-5. [How it works](#how-it-works) — the three-layer design and why it's files instead of a database
-6. [Honest caveats](#honest-caveats) — what this is not
+1. [What this gets you](#what-this-gets-you): why bother, in terms of things you can actually ask for
+2. [Quick start](#quick-start): three steps, one pasted prompt
+   - [If you've never used a terminal](#if-youve-never-used-a-terminal): reassurance and a five-term glossary
+3. [What setup creates](#what-setup-creates): the folder you end up with, file by file
+4. [After setup](#after-setup): the guides, from first week to apps, proactivity, and phone access
+5. [How it works](#how-it-works): the three-layer design and why it's files instead of a database
+6. [Honest caveats](#honest-caveats): what this is not
 
 ## What this gets you
 

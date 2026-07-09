@@ -4,7 +4,25 @@ HQ is a file-based personal memory system for a coding agent, Claude Code, Codex
 
 Under the hood it's just markdown and JSON files in a git repo.
 
-## What this gets you that a normal chat doesn't
+## Contents
+
+Three ways in, depending on who you are:
+
+- **"Just set me up."** Go straight to [Quick start](#quick-start). It's one pasted prompt, and it's written so that someone who has never opened a terminal can follow it.
+- **"Convince me first."** Read [What this gets you](#what-this-gets-you), and if you're weighing HQ against something specific (Obsidian, ChatGPT's memory, OpenClaw, Hermes), see [guides/comparisons.md](guides/comparisons.md). The reasoning behind the design is in [How it works](#how-it-works).
+- **"I already set it up."** Head to [After setup](#after-setup) for the first-week guide and the upgrades: apps, proactivity, phone access.
+
+All sections:
+
+1. [What this gets you](#what-this-gets-you) — why bother, in terms of things you can actually ask for
+2. [Quick start](#quick-start) — three steps, one pasted prompt
+   - [If you've never used a terminal](#if-youve-never-used-a-terminal) — reassurance and a five-term glossary
+3. [What setup creates](#what-setup-creates) — the folder you end up with, file by file
+4. [After setup](#after-setup) — the guides: first week, apps, proactivity, sync and phone
+5. [How it works](#how-it-works) — the three-layer design and why it's files instead of a database
+6. [Honest caveats](#honest-caveats) — what this is not
+
+## What this gets you
 
 A regular Claude or ChatGPT conversation starts over every time, and the built-in "memory" features hold a short list of facts that the vendor's system decides to keep. An HQ changes what you can actually ask for:
 
@@ -17,32 +35,9 @@ A regular Claude or ChatGPT conversation starts over every time, and the built-i
 
 The one-line version: a chatbot is a very good conversation; this is a very good colleague. Chat memory is a feature the vendor runs; this is a system you can read, correct, and take with you.
 
-## Why this instead of an app with memory
+Comparing it to something specific you already use or have heard of? [guides/comparisons.md](guides/comparisons.md) takes the alternatives one at a time (bare Claude Code, app memory, Obsidian, OpenClaw, Hermes, and more), honestly, including what each does better.
 
-Coding agents are already good at one thing: reading and writing files. So instead of bolting on a memory feature (a vector store, a hosted API, a "memory" toggle you have to trust), HQ just uses the agent's native strength. Your memory lives as plain text you can open in any editor, `grep`, diff, and read yourself, which means it inherits everything plain files are already good at:
-
-- **You can read it.** Nothing is stored in a format only the agent can query. Open any file and you see exactly what it "knows" about you.
-- **You own it.** Switch from Claude Code to Codex, or to whatever comes next, and your memory comes with you. No export, no migration.
-- **It's versioned for free.** Every fact ever written has a git history. Bad edit? Roll it back. Want to know when you decided something? `git log` it.
-- **There's nothing to run.** No server, no schema, no auth layer, no bill. It's a folder.
-
-The tradeoff is that it doesn't scale to a team, and it's not trying to. This is a memory system for one person and their agent.
-
-If you arrived here comparing this to something specific (Obsidian, ChatGPT's memory, just using Claude Code bare, OpenClaw, Hermes), **[guides/comparisons.md](guides/comparisons.md)** takes each one honestly, including what they do better.
-
-## The design, briefly
-
-Memory here splits into three layers because they answer three different questions and change at three different speeds:
-
-1. **A knowledge graph** (`vault/`): durable facts about people, projects, companies, and areas of your life, organized PARA-style. Answers "what's true." Updated when something durable is learned.
-2. **A daily log** (`memory/YYYY-MM-DD.md`): a raw timeline of what happened in each session. Answers "when did this happen." Updated continuously.
-3. **Identity files** (an agent voice/behavior file, a user profile file): answer "how should the agent operate, and who is it operating for." Updated rarely, only when a real pattern shows up.
-
-Retrieval is deliberately grep-first: one index file (`vault/index.md`) pointing to entity folders, then `grep` for specifics. No embeddings, no search infra. At the scale of one person's life, a well-organized set of files beats a search index that can go stale or return confidently wrong results. Wire up real search later if you ever actually need it. The full reasoning is in `vault/resources/memory-architecture.md`, seeded when you set up.
-
-Everything else in the repo (the operating manual, the task list, the skills convention) exists to keep those three layers accurate and cheap to read, session after session, for an agent that starts every session with no memory of the last one.
-
-## How to use this repo
+## Quick start
 
 No cloning or downloading required. The whole setup is: open your agent, turn on auto mode, paste one prompt.
 
@@ -62,9 +57,9 @@ That's it. No config file to hand-edit first, no accounts to create. The intervi
 
 (The traditional route still works if you prefer it: clone or download this repo, open the folder in your agent, and say "Read AGENTS.md and set up my HQ.")
 
-### Never used a terminal?
+### If you've never used a terminal
 
-You don't need to be a developer for any of this, and you never have to touch a raw terminal window: the [Claude Code](https://claude.com/claude-code) desktop app or Cowork counts. Install it, do the three steps above, and the agent does every technical step itself: creating folders, writing files, running git. Your job is answering questions about your life, and saying yes or no. If anything ever looks broken, describe what you see in plain words ("it says the push was rejected") and ask the agent to fix it. That is a normal and correct way to operate this system, not a workaround.
+You don't need to be a developer for any of this, and you never have to touch a raw terminal window: the [Claude Code](https://claude.com/claude-code) desktop app or Cowork counts. Install it, do the steps above, and the agent does every technical step itself: creating folders, writing files, running git. Your job is answering questions about your life, and saying yes or no. If anything ever looks broken, describe what you see in plain words ("it says the push was rejected") and ask the agent to fix it. That is a normal and correct way to operate this system, not a workaround.
 
 Five terms you'll see, so nothing reads as magic:
 
@@ -74,7 +69,7 @@ Five terms you'll see, so nothing reads as magic:
 - **Remote**: that online copy, typically a *private* GitHub repository. (No GitHub account? You don't need one to set up; you'll want a free one later for backup and phone access. [guides/your-hq-everywhere.md](guides/your-hq-everywhere.md) explains what GitHub is and walks through the two-minute signup.)
 - **Connector (MCP)**: a plug that lets the agent see one of your apps, like email or calendar. See [guides/connect-your-apps.md](guides/connect-your-apps.md).
 
-## What you end up with
+## What setup creates
 
 A git repo that looks roughly like this:
 
@@ -97,15 +92,38 @@ It won't be complete after setup. The vault starts with a handful of real entiti
 
 ## After setup
 
-Start with **[Your first week](guides/first-week.md)**: what the first days should look like, how to tell the system is actually working, and a plain-words fix for everything that commonly looks broken (cold starts, wrong facts, rejected pushes).
+Each guide is written in plain language and marked with when to read it:
 
-Then, once the basic rhythm is running, three additions turn the memory system into something closer to an assistant:
-
-- **[Connect your apps](guides/connect-your-apps.md)**: plug in calendar, email, and documents so the agent can see the parts of your life that don't live in files. Plain-language guide, including the rule that keeps it safe (seeing is free, acting always requires your confirmation).
-- **[Make it proactive](guides/proactive.md)**: a daily morning briefing (calendar, threads waiting on you, yesterday's roundup, today's priorities), how to schedule it, its honest limitations, and the read-only rule every scheduled task should follow.
-- **[Your HQ everywhere](guides/your-hq-everywhere.md)**: the private GitHub remote, hand-held; the pull/push rhythm that keeps machines in sync; what to say when git complains; and using your HQ from the web or your phone.
+| Guide | What it covers | When to read it |
+|---|---|---|
+| [Your first week](guides/first-week.md) | Day-by-day expectations, how to tell it's working, plain-words fixes for everything that commonly looks broken | Right after setup |
+| [Connect your apps](guides/connect-your-apps.md) | Calendar, email, and documents via connectors, and the rule that keeps it safe (seeing is free, acting needs your confirmation) | Within the first week |
+| [Make it proactive](guides/proactive.md) | A daily morning briefing, how to schedule it, its honest limits, and the read-only rule for anything scheduled | After a few days of real use |
+| [Your HQ everywhere](guides/your-hq-everywhere.md) | What GitHub is, the private remote, the pull/push rhythm, what to say when git complains, web and phone access | When you want backup or phone access, or when git first complains |
+| [Comparisons](guides/comparisons.md) | HQ against Obsidian, app memory, OpenClaw, Hermes, bare Claude Code, and the rest | Anytime, especially before committing |
 
 None of these are required. They're where the "companion" part starts to show.
+
+## How it works
+
+Coding agents are already good at one thing: reading and writing files. So instead of bolting on a memory feature (a vector store, a hosted API, a "memory" toggle you have to trust), HQ just uses the agent's native strength. Your memory lives as plain text you can open in any editor, `grep`, diff, and read yourself, which means it inherits everything plain files are already good at:
+
+- **You can read it.** Nothing is stored in a format only the agent can query. Open any file and you see exactly what it "knows" about you.
+- **You own it.** Switch from Claude Code to Codex, or to whatever comes next, and your memory comes with you. No export, no migration.
+- **It's versioned for free.** Every fact ever written has a git history. Bad edit? Roll it back. Want to know when you decided something? `git log` it.
+- **There's nothing to run.** No server, no schema, no auth layer, no bill. It's a folder.
+
+The tradeoff is that it doesn't scale to a team, and it's not trying to. This is a memory system for one person and their agent.
+
+Inside the folder, memory splits into three layers because they answer three different questions and change at three different speeds:
+
+1. **A knowledge graph** (`vault/`): durable facts about people, projects, companies, and areas of your life, organized PARA-style. Answers "what's true." Updated when something durable is learned.
+2. **A daily log** (`memory/YYYY-MM-DD.md`): a raw timeline of what happened in each session. Answers "when did this happen." Updated continuously.
+3. **Identity files** (an agent voice/behavior file, a user profile file): answer "how should the agent operate, and who is it operating for." Updated rarely, only when a real pattern shows up.
+
+Retrieval is deliberately grep-first: one index file (`vault/index.md`) pointing to entity folders, then `grep` for specifics. No embeddings, no search infra. At the scale of one person's life, a well-organized set of files beats a search index that can go stale or return confidently wrong results. Wire up real search later if you ever actually need it. The full reasoning is in `vault/resources/memory-architecture.md`, seeded when you set up.
+
+Everything else in the repo (the operating manual, the task list, the skills convention) exists to keep those three layers accurate and cheap to read, session after session, for an agent that starts every session with no memory of the last one.
 
 ## Honest caveats
 

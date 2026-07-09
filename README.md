@@ -3,6 +3,20 @@
 HQ is a file-based personal memory system for a coding agent, Claude Code, Codex, or anything similar. Point the agent at this repo, answer some questions about yourself, and you get an agent that remembers who you are, what you're working on, and how you like to work, across sessions, without a database, a hosted service, or an app to maintain.
 
 Under the hood it's just markdown and JSON files in a git repo.
+
+## What this gets you that a normal chat doesn't
+
+A regular Claude or ChatGPT conversation starts over every time, and the built-in "memory" features hold a short list of facts that the vendor's system decides to keep. An HQ changes what you can actually ask for:
+
+- **"What's on my plate today?"** answered from your real task list, your calendar, and yesterday's notes, not from you re-explaining your life at the top of every chat.
+- **"What did we decide about the pricing page last month, and why?"** answered from a written decision log, with the reasoning.
+- **"Prep me for my 2pm with Dana."** Calendar entry + who Dana is + where things left off, pulled together without you assembling it.
+- **Drafts in your voice, with context.** An email to a client it already knows, informed by the history of that relationship, not a generic template.
+- **Pick up cold, weeks later.** Open a session after a month away and the agent knows where every project stopped and what the next step was.
+- **It compounds.** Every session leaves the files a little richer, and anything you ask for twice can become a repeatable skill. A chat, by contrast, is worth the same on day 300 as on day 1.
+
+The one-line version: a chatbot is a very good conversation; this is a very good colleague. Chat memory is a feature the vendor runs; this is a system you can read, correct, and take with you.
+
 ## Why this instead of an app with memory
 
 Coding agents are already good at one thing: reading and writing files. So instead of bolting on a memory feature (a vector store, a hosted API, a "memory" toggle you have to trust), HQ just uses the agent's native strength. Your memory lives as plain text you can open in any editor, `grep`, diff, and read yourself, which means it inherits everything plain files are already good at:
@@ -30,23 +44,27 @@ Everything else in the repo (the operating manual, the task list, the skills con
 
 ## How to use this repo
 
-1. Clone or fork this repo.
-2. Open it with Claude Code, Codex, or your agent of choice.
-3. Say: **"Read AGENTS.md and set up my HQ."**
-4. Answer its questions. It'll ask short, direct things: your name, timezone, what you're currently working on, how you like to be talked to, anything that's off-limits, a few people or projects worth knowing about upfront, and where your actual project code lives on disk.
+No cloning or downloading required. The whole setup is: open your agent, turn on auto mode, paste one prompt.
+
+1. **Open Claude Code or Cowork** (Codex and others work too; any agent that can read URLs and write files).
+2. **Turn on auto mode first.** The setup creates a few dozen files, and without auto mode you'll be asked to approve every single one. Each prompt looks scarier than it is, and denying them breaks the flow. In Claude Code, press Shift+Tab until the mode line says edits are auto-accepted; in Cowork, choose the "always allow" style option when the first permission prompt appears. You can turn it back off the moment setup is done.
+3. **Paste this** (swap in your fork's URL if you forked):
+
+   > Set up my HQ: a private, file-based memory system for you and me, in a new folder at ~/hq. The instructions live in the repo at https://github.com/smithavt14/hq-starter. Fetch and read https://raw.githubusercontent.com/smithavt14/hq-starter/main/AGENTS.md and follow it start to finish. When it references template files in the starter repo (templates/...), fetch those from the same repo. Interview me before writing anything, exactly as the instructions say.
+
+4. **Answer its questions.** Short, direct things: your name, timezone, what you're working on, how you like to be talked to, anything off-limits, a few people or projects worth knowing upfront.
+
+   *Already use Claude (or ChatGPT) with memory turned on?* There's a shortcut: ask the setup agent to "give me the full interview as one block of questions I can paste elsewhere," paste that block into the chat that already knows you, then paste its answers back. You'll confirm and correct rather than typing your life story from scratch. The setup agent knows to treat those answers as drafts, since another assistant's memory of you can be stale or wrong.
+
 5. It scaffolds the rest: an identity file, a user profile, a project map, an empty vault ready for real entities, and a first commit.
 
 That's it. No config file to hand-edit first, no accounts to create. The interview is intentionally short. These files are meant to be corrected over time, not gotten right on day one.
 
+(The traditional route still works if you prefer it: clone or download this repo, open the folder in your agent, and say "Read AGENTS.md and set up my HQ.")
+
 ### Never used a terminal?
 
-You don't need to be a developer for any of this. The realistic minimum:
-
-1. Install [Claude Code](https://claude.com/claude-code). The desktop app counts; you never have to touch a raw terminal window if you don't want to.
-2. Download this repo (the green "Code" button on GitHub → "Download ZIP" works fine if "clone" means nothing to you) and open that folder in Claude Code.
-3. Type: **"Read AGENTS.md and set up my HQ."**
-
-From there the agent does every technical step itself: creating folders, writing files, running git. Your job is answering questions about your life, and saying yes or no. If anything ever looks broken, describe what you see in plain words ("it says the push was rejected") and ask the agent to fix it. That is a normal and correct way to operate this system, not a workaround.
+You don't need to be a developer for any of this, and you never have to touch a raw terminal window: the [Claude Code](https://claude.com/claude-code) desktop app or Cowork counts. Install it, do the three steps above, and the agent does every technical step itself: creating folders, writing files, running git. Your job is answering questions about your life, and saying yes or no. If anything ever looks broken, describe what you see in plain words ("it says the push was rejected") and ask the agent to fix it. That is a normal and correct way to operate this system, not a workaround.
 
 Five terms you'll see, so nothing reads as magic:
 

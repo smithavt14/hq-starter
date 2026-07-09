@@ -4,6 +4,17 @@ You are about to build **HQ**: a file-based second brain and companion workspace
 
 Do not skip steps. Do not pre-fill files with example/placeholder content that could later be mistaken for real data. If you don't have a real answer yet, leave the section empty or marked `(TBD)`, never invented.
 
+**Working from the URL instead of a local clone?** That's the normal path (the README's
+get-started prompt points here directly). Whenever this file references another file in the
+starter repo (`templates/`, `guides/`), fetch it from
+`https://raw.githubusercontent.com/smithavt14/hq-starter/main/<path>` (or the user's fork).
+Nothing in this procedure requires the starter repo to be on disk.
+
+**Permission prompts:** if the harness is asking the user to approve every file write, pause
+and suggest they switch on auto-accept / auto mode for the rest of setup. This procedure
+creates a few dozen files; per-file approval is noise for the user, and denials mid-scaffold
+leave the structure half-built.
+
 ---
 
 ## Step 0: Before any content exists
@@ -36,6 +47,15 @@ Do not skip steps. Do not pre-fill files with example/placeholder content that c
 ## Step 1: Interview the user
 
 Run this before writing any content file. Keep it short. These files get corrected over time, they don't need to be exhaustive on day one. Ask conversationally, not as a rigid form, but make sure you come away with answers to all of these:
+
+**Offer the shortcut first.** If the user already has a Claude or ChatGPT chat with memory of
+them, offer to hand them the entire interview as one block of questions to paste there, and
+have them paste the answers back. This saves them typing their life story manually. Treat
+whatever comes back as **drafts, not ground truth**: another assistant's memory can be stale,
+partial, or wrong, so read the answers back to the user section by section and confirm or
+correct before writing anything to a file. The anti-placeholder rule above applies doubly
+here; an unconfirmed imported answer is just a plausible-sounding guess with better
+formatting.
 
 **Identity**
 - Name / preferred address, timezone.
@@ -531,8 +551,10 @@ user's name. This is the one skill that doesn't wait for a recurring need: the e
 checkpoint (log → promote facts → update tasks → flag stragglers → commit → push) is the
 mechanism that keeps memory and cross-machine sync intact, and it's needed from the very first
 session. It is the executable form of the Step 7 session-end procedure; any "wrap up" /
-"let's stop here" signal from the user should trigger it. If the starter repo is no longer on
-disk, reconstruct the skill from Step 7 instead of skipping it.
+"let's stop here" signal from the user should trigger it. No local clone? Fetch it from
+`https://raw.githubusercontent.com/smithavt14/hq-starter/main/templates/skills/session-wrap/SKILL.md`
+(or the user's fork); only if that's unreachable, reconstruct it from Step 7 instead of
+skipping it.
 
 Every *other* skill waits until its need has actually recurred (per the bar in the README
 above). Don't seed the folder with speculative capabilities. That includes the starter's
@@ -649,7 +671,8 @@ items (search index, automated extraction, decay) per the triggers stated in
 ## Step 8: Point the user onward (don't build these now)
 
 Bootstrap ends here. Before you close, point the user, briefly, at the starter repo's
-`guides/` folder:
+`guides/` folder (no local clone? give them the web links, e.g.
+`https://github.com/smithavt14/hq-starter/blob/main/guides/first-week.md`):
 
 1. **What the first week looks like** (`guides/first-week.md`): day-by-day expectations
    and a plain-words troubleshooting FAQ. Worth reading right away; it sets the "the vault

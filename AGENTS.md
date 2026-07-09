@@ -88,6 +88,7 @@ formatting.
 **Memory logistics**
 - Confirm where their real project code lives (used to finalize `.claude/settings.json` and `MAP.md`).
 - Ask whether they want this synced to a git remote. If yes, the remote **must be private**. This repo will hold personal, and possibly sensitive, information about them. Create it explicitly private, e.g. `gh repo create <name> --private --source . --remote origin`, or create a private repo in the GitHub UI and `git remote add origin <url>`. Never push this to a public remote. If the user isn't comfortable with git or GitHub, walk them through the hand-held path in `guides/your-hq-everywhere.md`, and verify the `Private` badge together before the first push.
+- **No GitHub account?** Don't derail the interview to create one. Note sync as deferred, finish the bootstrap local-only (skip the push in Step 6), and point them at the "what GitHub is" section of `guides/your-hq-everywhere.md` for when they're ready. A local-only HQ is fully functional; it just isn't backed up or reachable from other devices yet.
 
 **Before leaving Step 1, do these now, don't defer:**
 - Edit `.claude/settings.json` and replace the `~/Workspace` placeholder with the real code path(s) you just confirmed. Add multiple array entries if the code lives in more than one root. A wrong or placeholder path here means future sessions silently can't read their project files.

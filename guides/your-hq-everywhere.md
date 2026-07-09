@@ -2,6 +2,20 @@
 
 HQ works fine on one machine with no remote at all. But putting it on a private GitHub repo buys three things at once: a backup, the ability to work from a second machine or your phone, and the cloud-side scheduling that [proactive.md](proactive.md) describes. This guide is the sync story end to end, written for people who don't want to learn git to get it.
 
+## First: what GitHub is, and whether you need an account
+
+GitHub is a website that stores copies of folders along with their full change history. Developers use it for code; you're using it as an off-site copy of your HQ that only you can see. That's the whole role it plays here: if your laptop dies, your HQ isn't gone, and any other device you own can pull the same copy.
+
+You do **not** need a GitHub account to set up and use an HQ on one machine. You need one for everything in this guide: backup, a second machine, your phone, cloud scheduling. It's worth having.
+
+Signing up takes about two minutes and is free:
+
+1. Go to [github.com/signup](https://github.com/signup).
+2. Enter an email, choose a password and a username (the username appears in your repo's web address; anything you like is fine).
+3. Verify the email, pick the **Free** plan. Free accounts include private repositories, which is the only kind your HQ will ever use.
+
+That's all. You never need to learn the website itself; your agent does the git work, and the one page worth knowing is your repo's page, where you'll verify the `Private` badge below.
+
 ## Setting up the private remote
 
 Everything in your vault goes to this repo, including facts marked sensitive. It must be **private**, and it's worth thirty seconds to verify that it is.

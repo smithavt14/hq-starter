@@ -71,7 +71,7 @@ Five terms you'll see, so nothing reads as magic:
 - **Repo**: a folder whose entire history is tracked. Your HQ is one.
 - **Commit**: a saved snapshot of that folder, with a note about what changed.
 - **Push / pull**: send your snapshots to an online copy / fetch snapshots made elsewhere. This is how your HQ syncs across machines.
-- **Remote**: that online copy, typically a *private* GitHub repository.
+- **Remote**: that online copy, typically a *private* GitHub repository. (No GitHub account? You don't need one to set up; you'll want a free one later for backup and phone access. [guides/your-hq-everywhere.md](guides/your-hq-everywhere.md) explains what GitHub is and walks through the two-minute signup.)
 - **Connector (MCP)**: a plug that lets the agent see one of your apps, like email or calendar. See [guides/connect-your-apps.md](guides/connect-your-apps.md).
 
 ## What you end up with

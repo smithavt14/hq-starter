@@ -126,6 +126,22 @@ function allEntities() {
   return out;
 }
 
+// Levenshtein distance, used only to build the suggestion list. Entity counts
+// are in the dozens, so the simple O(n*m) version costs nothing.
+function distance(a, b) {
+  if (a === b) return 0;
+  if (Math.abs(a.length - b.length) > 3) return 99;
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const row = [i];
+    for (let j = 1; j <= b.length; j++) {
+      row[j] = Math.min(prev[j] + 1, row[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = row;
+  }
+  return prev[b.length];
+}
+
 // Exact match or nothing. A near miss prints its candidates and refuses, so a
 // typo can never quietly become a second entity.
 function resolveEntity(ref) {
@@ -136,8 +152,17 @@ function resolveEntity(ref) {
   if (exact.length > 1) {
     return { ok: false, why: `"${ref}" matches ${exact.length} entities`, candidates: exact.map((e) => e.path) };
   }
+  // Substrings catch a truncation ("dan" for "dana"). A dropped or swapped
+  // letter leaves no substring to match on, so edit distance catches the rest:
+  // "dot-fenimore" still suggests "dot-fennimore" rather than nothing at all.
   const near = ents
-    .filter((e) => e.path.toLowerCase().includes(want) || want.includes(e.name.toLowerCase()) || e.name.toLowerCase().includes(want))
+    .filter((e) => {
+      const name = e.name.toLowerCase();
+      const path = e.path.toLowerCase();
+      if (path.includes(want) || want.includes(name) || name.includes(want)) return true;
+      const budget = want.length <= 4 ? 1 : 2;
+      return distance(want, name) <= budget || distance(want, path) <= budget;
+    })
     .map((e) => e.path);
   return { ok: false, why: `"${ref}" did not resolve to an entity`, candidates: near };
 }

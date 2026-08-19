@@ -162,6 +162,22 @@ test('a near-miss entity is refused and nothing is written', (root) => {
   assert(!existsSync(join(root, 'vault/areas/people/dan')), 'a phantom entity folder was created');
 });
 
+// A dropped letter leaves no substring to match on, so a substring-only search
+// hands back an empty candidate list while the docs promise candidates.
+test('a mistyped letter still gets a candidate', (root) => {
+  const r = run(root, ['note', 'Should not land', '--entity', 'northwnd']);
+  assert(r.code !== 0, 'the typo was accepted');
+  assert(r.stderr.includes('did you mean'), 'no candidate was printed');
+  assert(r.stderr.includes('areas/northwind'), `the candidate is not northwind:\n${r.stderr}`);
+  assert(facts(root, 'areas/northwind').length === 0, 'a fact was written anyway');
+});
+
+test('a genuinely unrelated ref gets no candidates and still refuses', (root) => {
+  const r = run(root, ['note', 'Should not land', '--entity', 'quarterly-taxes']);
+  assert(r.code !== 0, 'an unknown entity was accepted');
+  assert(!r.stderr.includes('did you mean'), `candidates were invented:\n${r.stderr}`);
+});
+
 test('an unresolvable --related is refused and nothing is written', (root) => {
   const r = run(root, ['note', 'Should not land', '--entity', 'dana', '--related', 'northwynd']);
   assert(r.code !== 0, 'the bad related ref was accepted');

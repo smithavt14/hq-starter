@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "items": [
+    {
+      "id": "c1787159572056",
+      "kind": "comment",
+      "by": "you",
+      "anchor": {
+        "quote": "Tell it where your life is already written down.",
+        "occurrence": 0
+      },
+      "status": "resolved",
+      "thread": [
+        {
+          "by": "you",
+          "at": "2026-08-19T17:12:52.056Z",
+          "text": "This should be auto, no?"
+        },
+        {
+          "by": "claude",
+          "at": "2026-08-19T17:13:26.020Z",
+          "text": "Right, the machine knows it. Cut it from the interview here and in AGENTS.md Step 1: the agent takes it from date, mentions it in passing, and only corrects on objection."
+        },
+        {
+          "by": "claude",
+          "at": "2026-08-19T17:15:57.547Z",
+          "text": "Restructured. Step 1 is now sources-first: it opens by asking whether an assistant already has memory of them and where files about their life already live (disk, notes, drives, email), harvests what it can reach, confirms the drafts, and only interviews for what no source settled. Hard lines stay an explicit ask, never inferred from files. README quick start steps 4-5 now say the same. Connectors still wait for after setup; the named sources become the wishlist."
+        }
+      ],
+      "matchedAt": "2026-08-19T17:17:16.838Z",
+      "orphanedAt": "2026-08-19T17:13:26.024Z",
+      "orphanReason": "text-changed",
+      "decidedAt": "2026-08-19T17:14:27.052Z"
+    },
+    {
+      "id": "c1787159652864",
+      "kind": "comment",
+      "by": "you",
+      "anchor": {
+        "quote": "Answer its questions. Short, direct things: your name,",
+        "occurrence": 0
+      },
+      "status": "resolved",
+      "thread": [
+        {
+          "by": "you",
+          "at": "2026-08-19T17:14:12.864Z",
+          "text": "I think part of the onboarding and scaffolding should really not be that the user gives Like a Q&A should be the very last thing or I guess a Q&A about the users life should be the very last thing It should ask, you know, are you already using a Chat GPT or cloud subscription today, right? Do you already have files about your clients or your life or your projects? And if so, where are they? because what that allows the Agent to do it allows to identify where is all this information already exist if it exists in emails If it exists in Google Drive in Microsoft Drive if it exists on the desktop of the user if it exists wherever it might be and Only if this information does not already exist somewhere then does a typical Q&A about their life need to happen"
+        },
+        {
+          "by": "claude",
+          "at": "2026-08-19T17:17:39.249Z",
+          "text": "Done, this landed as the restructure you're looking at: sources first (assistant memory, disk, drives, email), harvest and confirm, and the Q&A only covers what no source settled. AGENTS.md Step 1 got the full version; hard lines stay an explicit ask. My earlier reply about it ended up on the timezone thread by mistake, this is the right home."
+        }
+      ],
+      "matchedAt": "2026-08-19T17:14:15.870Z",
+      "orphanedAt": "2026-08-19T17:15:57.550Z",
+      "orphanReason": "text-changed",
+      "decidedAt": "2026-08-19T17:19:04.318Z"
+    },
+    {
+      "id": "c1787159893029",
+      "kind": "comment",
+      "by": "you",
+      "anchor": {
+        "quote": "where your project files live, code or otherwise",
+        "occurrence": 0
+      },
+      "status": "resolved",
+      "thread": [
+        {
+          "by": "you",
+          "at": "2026-08-19T17:18:13.029Z",
+          "text": "It might not be code so should map.md the description here not mention project code But like where your project files live"
+        },
+        {
+          "by": "claude",
+          "at": "2026-08-19T17:18:44.389Z",
+          "text": "True, code is the developer's special case. Changed the tree line to \"where your project files live, code or otherwise\" and I'm having the same sweep applied across AGENTS.md (the interview, the MAP.md template, the settings.json wording) so a writer or a business owner reads themselves in it too."
+        }
+      ],
+      "matchedAt": "2026-08-19T17:19:15.888Z",
+      "orphanedAt": "2026-08-19T17:18:44.394Z",
+      "orphanReason": "text-changed",
+      "decidedAt": "2026-08-19T17:19:08.816Z"
+    }
+  ]
+}

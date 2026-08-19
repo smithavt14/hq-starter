@@ -22,7 +22,7 @@ leave the structure half-built.
 1. **Choose a root directory (e.g. `~/hq`), and confirm you can write to it before anything else.** `cd` to it (create it first, `mkdir -p ~/hq`), and check it doesn't already exist as a git repo before you `git init`. You're bootstrapping from nothing, not on top of something.
 
    An agent started inside some other folder is usually scoped to that folder, so writes to `~/hq` get refused or prompted one at a time and the scaffold ends up half-built. If that's what you're seeing, say so and ask the user to grant access to the home folder, `/add-dir ~` in Claude Code, or to close the session and reopen the agent in their home folder. Then start again from here.
-2. **Check for Node now, before you write a word of the manual.** Run `node --version`. Anything 18 or newer means the toolchain in Step 5b will install, and Step 3d writes the manual that uses it. If Node is missing, note that and carry it through: Step 3d has a by-hand variant of three sections, and Step 5b has a shorter install. Finding this out here costs one command; finding it out in Step 5b means rewriting the manual you already wrote.
+2. **Check for Node now, before you write a word of the manual.** Run `node --version`. Anything 18 or newer means the toolchain in Step 5b will install, and Step 3d writes the manual that uses it. Treat a version older than 18 exactly as you treat a missing one: take the by-hand path, and tell the user that installing a current Node and rerunning Step 5b turns the commands on later. If Node is missing or too old, carry that through the whole procedure: Step 3d has a by-hand variant of five sections, Steps 4c, 4e, 5b.4, 6, and 7 each have a by-hand branch, and Step 5b installs the hooks only. Finding this out here costs one command; finding it out in Step 5b means rewriting the manual you already wrote.
 3. Write `.gitignore` **first**, before any other file touches disk:
    ```
    .DS_Store
@@ -477,8 +477,9 @@ manual with these substitutions from the start and tell the user plainly that th
 captures by hand until Node is installed:
 
 - "Saving memory" loses the commands and gains the manual routing: a durable fact is
-  appended by hand to `vault/<entity>/items.json` as a new object following the schema in
-  `vault/PARA_GUIDE.md`, with an `id` of `<entity-folder>-NNN` continuing that file's
+  appended by hand to `vault/<bucket>/<entity>/items.json` (the bucket segment is part of
+  the path, e.g. `vault/areas/people/dana/items.json`) as a new object following the schema
+  in `vault/PARA_GUIDE.md`, with an `id` of `<entity-folder>-NNN` continuing that file's
   sequence; how {{name}} operates goes under `## Working style` in `USER.md`; everything
   else goes to `memory/YYYY-MM-DD.md`. Creating a new entity is the same three steps minus
   the command: make the folder with `summary.md` and an `items.json` holding `[]`, write the
@@ -649,13 +650,10 @@ Read this first. Narrow into a bucket, then grep, then read summary.md.
 ## Projects
 | Entity | Summary | Description |
 |---|---|---|
-| {{Project}} | [summary](projects/{{project}}/summary.md) | {{one line}} |
 
 ## Areas
 | Entity | Summary | Description |
 |---|---|---|
-| {{Person}} | [summary](areas/people/{{person}}/summary.md) | {{relationship, one line}} |
-| {{Company}} | [summary](areas/{{company}}/summary.md) | {{one line}} |
 
 ## Resources
 | Entity | Summary | Description |

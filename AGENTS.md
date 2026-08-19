@@ -476,7 +476,7 @@ first one happens when there's genuinely something to reflect on.
 
 ### 4b. `vault/PARA_GUIDE.md`: the spec every future vault write follows
 
-```markdown
+````markdown
 # PARA_GUIDE: how to file things in vault/
 
 ## Which bucket?
@@ -548,7 +548,7 @@ Append-only array. Never delete an entry: supersede it.
 Never delete a fact. Correct forward: add a new entry, mark the old one superseded, point
 `supersededBy` at the new entry's `id`. `node scripts/hq.mjs note supersede <id> --with
 "<the corrected fact>"` does all three in one step.
-```
+````
 
 ### 4c. `vault/index.md`: the master table of contents
 

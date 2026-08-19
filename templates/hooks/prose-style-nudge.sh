@@ -10,6 +10,13 @@
 # Reads the hook payload with sed instead of a JSON parser: this has to run on a
 # machine with no Node and no Python.
 #
+# The nudge is printed as a JSON object, not as a bare line. A PostToolUse hook
+# that exits 0 has its plain stdout written to the debug log and never shown to
+# the model, so a bare `echo` here reaches nobody. The structured fields are
+# still parsed on exit 0, and `hookSpecificOutput.additionalContext` is the one
+# that reaches the model. Codex reads the same shape.
+# https://code.claude.com/docs/en/hooks
+#
 # Registered in .claude/settings.json (PostToolUse) and .codex/hooks.json.
 
 INPUT=$(cat | tr -d '\n')
@@ -52,5 +59,9 @@ MARKER="${TMPDIR:-/tmp}/hq-prose-nudge-$(hash_of "$SESSION$FILE")"
 [ -f "$MARKER" ] && exit 0
 touch "$MARKER"
 
-echo "Prose someone will read was just written ($BASE). House style, from the manual: no em dashes; plain verbs; state the positive claim rather than \"not X, it's Y\"; keep the articles and function words; no filler or signposting; specifics over adjectives. Re-read it against those before it goes out."
+# The payload is JSON, so anything interpolated into it gets stripped down to
+# characters that cannot break the object. A filename is the only variable part.
+SAFE=$(printf '%s' "$BASE" | tr -cd 'A-Za-z0-9._-')
+
+printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"Prose someone will read was just written (%s). House style, from the manual: no em dashes; plain verbs; state the positive claim rather than a negation of its opposite; keep the articles and function words; no filler or signposting; specifics over adjectives. Re-read it against those before it goes out."}}\n' "$SAFE"
 exit 0

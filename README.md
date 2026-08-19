@@ -45,13 +45,13 @@ No cloning or downloading required. The whole setup is: open your agent, turn on
 2. **Turn on auto mode first.** The setup creates a few dozen files, and without auto mode you'll be asked to approve every single one. Each prompt looks scarier than it is, and denying them breaks the flow. In Claude Code, press Shift+Tab until the mode line says edits are auto-accepted; in Cowork, choose the "always allow" style option when the first permission prompt appears. You can turn it back off the moment setup is done.
 3. **Paste this** (swap in your fork's URL if you forked):
 
-   > Set up my HQ: a private, file-based memory system for you and me, in a new folder at ~/hq. The instructions live in the repo at https://github.com/smithavt14/hq-starter. Fetch and read https://raw.githubusercontent.com/smithavt14/hq-starter/main/AGENTS.md and follow it start to finish. When it references template files in the starter repo (templates/...), fetch those from the same repo. Interview me before writing anything, exactly as the instructions say.
+   > Set up my HQ: a private, file-based memory system for you and me, in a new folder at ~/hq. The instructions live in the repo at https://github.com/smithavt14/hq-starter. Fetch and read https://raw.githubusercontent.com/smithavt14/hq-starter/main/AGENTS.md and follow it start to finish. When it references template files in the starter repo (templates/...), fetch those from the same repo. Ask me where my context already lives, then interview me for the rest, exactly as the instructions say.
 
-4. **Answer its questions.** Short, direct things: your name, what you're working on, how you like to be talked to, anything off-limits, a few people or projects worth knowing upfront.
+4. **Tell it where your life is already written down.** It asks about sources before it asks about you: a Claude or ChatGPT that already has memory of you (it hands you one block of questions to paste there and you paste the answers back), folders and notes on your machine, cloud drives, email. It reads what it can reach, drafts your profile from that, and confirms every section with you, treating it all as drafts, since files go stale and another assistant's memory of you can be wrong.
 
-   *Already use Claude (or ChatGPT) with memory turned on?* There's a shortcut: ask the setup agent to "give me the full interview as one block of questions I can paste elsewhere," paste that block into the chat that already knows you, then paste its answers back. You'll confirm and correct rather than typing your life story from scratch. The setup agent knows to treat those answers as drafts, since another assistant's memory of you can be stale or wrong.
+5. **Answer the questions that remain.** Only what no source settled gets asked directly: your name, how you like to be talked to, anything off-limits. The typing-your-life-story part is what the sources are for.
 
-5. It scaffolds the rest: an identity file, a user profile, a project map, an empty vault ready for real entities, and a first commit.
+6. It scaffolds the rest: an identity file, a user profile, a project map, a vault seeded from what it read and what you confirmed, and a first commit.
 
 That's it. No config file to hand-edit first, no accounts to create. The interview is intentionally short. These files are meant to be corrected over time, not gotten right on day one.
 

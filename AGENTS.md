@@ -44,18 +44,38 @@ leave the structure half-built.
 
 ---
 
-## Step 1: Interview the user
+## Step 1: Find where their life is already written down, then interview for the rest
 
-Run this before writing any content file. Keep it short. These files get corrected over time, they don't need to be exhaustive on day one. Ask conversationally, not as a rigid form, but make sure you come away with answers to all of these:
+Run this before writing any content file. The order matters: most people's context already
+exists somewhere, and reading it beats making them retype it. A Q&A about their life comes
+last, for what exists nowhere else.
 
-**Offer the shortcut first.** If the user already has a Claude or ChatGPT chat with memory of
-them, offer to hand them the entire interview as one block of questions to paste there, and
-have them paste the answers back. This saves them typing their life story manually. Treat
-whatever comes back as **drafts, not ground truth**: another assistant's memory can be stale,
-partial, or wrong, so read the answers back to the user section by section and confirm or
-correct before writing anything to a file. The anti-placeholder rule above applies doubly
-here; an unconfirmed imported answer is just a plausible-sounding guess with better
-formatting.
+**Open with sources, not questions about the life itself:**
+- Do they already use Claude or ChatGPT with memory of them?
+- Where do files about their life, clients, or projects already live? A documents folder,
+  the desktop, a notes app, Google Drive or OneDrive, email and calendar. Anything named
+  here is a source, and the list doubles as the connector wishlist Step 8 points at.
+
+**Harvest what is reachable now:**
+- **Folders on this machine**: ask which paths matter, read them, and draft the profile,
+  the project list, and the first people entities from what is actually there.
+- **An assistant that already has memory of them**: hand the user the entire interview as
+  one block of questions to paste there, and have them paste the answers back. This saves
+  them typing their life story manually.
+- **Cloud accounts (email, calendar, drives)**: record that they exist and what lives in
+  each, but do **not** set up any connectors during bootstrap. Connecting works better as
+  a deliberate step against a live system; the walkthrough is `guides/connect-your-apps.md`.
+
+Treat everything harvested as **drafts, not ground truth**: files go stale and another
+assistant's memory can be partial or wrong, so read what you drafted back to the user
+section by section and confirm or correct before writing anything to a file. The
+anti-placeholder rule above applies doubly here; an unconfirmed imported answer is just a
+plausible-sounding guess with better formatting.
+
+**Then interview for the gaps.** Ask only what the sources did not settle, and confirm
+rather than re-ask what they did. Keep it short: these files get corrected over time, they
+don't need to be exhaustive on day one. Ask conversationally, not as a rigid form, but make
+sure that by the end, from sources or from the user, you have all of this:
 
 **Identity**
 - Name / preferred address. Take the timezone from the machine (`date`); mention it in passing and correct it only if the user objects, never ask for it.
@@ -71,16 +91,11 @@ formatting.
 - Key companies/organizations they're part of or deal with regularly.
 - Any recurring commitments or areas of ongoing responsibility (health, finances, a community they're part of, pets, etc.) worth a vault folder from day one.
 
-**Apps & connectors**
-- Which apps should the companion eventually be able to see: email, calendar, documents,
-  notes, anything else? Capture the answer (it informs `USER.md` and gets mentioned again in
-  Step 8), but do **not** set up any connectors during bootstrap. Connecting works better as
-  a deliberate step against a live system; the walkthrough is `guides/connect-your-apps.md`.
-
 **How they want the agent to work**
 - Desired tone/vibe (a handful of adjectives, or "talk like X").
 - Any phrasing or habits to explicitly avoid (e.g. "no corporate enthusiasm," "don't hedge," "no emoji").
-- Hard lines: non-negotiables. Always ask specifically about:
+- Hard lines: non-negotiables. Ask these out loud even when a source suggests the answers;
+  boundaries are stated, never inferred. Always ask specifically about:
   - Sending messages/emails or posting publicly as them: draft-and-confirm, or full autonomy?
   - Anything they never want the agent to do without asking.
   - Anything sensitive (health, finances, legal) that needs special handling.

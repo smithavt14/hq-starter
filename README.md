@@ -41,7 +41,7 @@ Comparing it to something specific you already use or have heard of? [guides/com
 
 No cloning or downloading required. The whole setup is: open your agent, turn on auto mode, paste one prompt.
 
-1. **Open Claude Code or Cowork** (Codex and others work too; any agent that can read URLs and write files).
+1. **Open your agent in your home folder.** Claude Code, Cowork, Codex, or anything else that can read URLs and write files. Setup builds a folder at `~/hq`, so it has to start somewhere it's allowed to write there; an agent opened inside some other project will ask permission for every single file (in Claude Code, typing `/add-dir ~` grants the home folder without restarting). Setup also installs one small command that needs Node 18 or newer, which most machines running Claude Code already have.
 2. **Turn on auto mode first.** The setup creates a few dozen files, and without auto mode you'll be asked to approve every single one. Each prompt looks scarier than it is, and denying them breaks the flow. In Claude Code, press Shift+Tab until the mode line says edits are auto-accepted; in Cowork, choose the "always allow" style option when the first permission prompt appears. You can turn it back off the moment setup is done.
 3. **Paste this** (swap in your fork's URL if you forked):
 
@@ -56,6 +56,8 @@ No cloning or downloading required. The whole setup is: open your agent, turn on
 That's it. No config file to hand-edit first, no accounts to create. The interview is intentionally short. These files are meant to be corrected over time, not gotten right on day one.
 
 (The traditional route still works if you prefer it: clone or download this repo, open the folder in your agent, and say "Read AGENTS.md and set up my HQ.")
+
+**If you're in Cowork.** Cowork sessions run on Anthropic's servers and load the skills you've enabled for your Claude account. Two conveniences an HQ installs, the hook that loads your files at the start of a session and the bundled wrap skill, may not load there: Anthropic's [skills documentation](https://code.claude.com/docs/en/skills) describes cloud sessions started from a cloned repository and doesn't say what a Cowork session does with a folder like `~/hq`, so treat that as unsettled rather than as working. Your HQ still reads and writes fine, because every file in it is plain text: if a session opens without your files in front of it, say "read CLAUDE.md and follow the startup protocol" and it catches up in one turn. Claude Code on your own machine is the smoothest path for setup itself.
 
 ### If you've never used a terminal
 
@@ -74,10 +76,12 @@ Five terms you'll see, so nothing reads as magic:
 A git repo that looks roughly like this:
 
 ```
-AGENTS.md          : operating manual the agent reads first, every session
+CLAUDE.md           : operating manual the agent reads first, every session
+                      (Codex calls it AGENTS.md; whichever your agent doesn't use
+                      is a one-line stub pointing at the other)
 SOUL.md             : the agent's voice and hard limits, living, agent-editable
 USER.md             : who you are, corrected over time, not written once
-MAP.md              : where your actual project code lives
+MAP.md              : where your project files live, code or otherwise
 vault/              : durable facts about people, projects, companies, areas of life
 memory/             : one file per day, a raw timeline of what happened
 journal/            : the agent's own occasional reflections, where its voice evolves from
@@ -88,6 +92,9 @@ scripts/            : the small command the agent captures through, checks the d
 hooks/              : two shell scripts your agent runs itself, one that loads your
                       files at the start of every session, one that reminds it of
                       your house writing style
+.claude/            : settings.json, naming the folders the agent may read and the
+                      hooks it runs, plus a link that lets it find the wrap skill
+                      by name
 TASKS.md            : what's in flight, and what's been settled
 ```
 

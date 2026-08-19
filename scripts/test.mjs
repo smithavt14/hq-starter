@@ -272,6 +272,25 @@ test('index picks up an entity added after the last run', (root) => {
   assert(/\*\*Stats:\*\* 5 entities/.test(text), 'the count did not update');
 });
 
+// vault/resources/memory-architecture.md, seeded by the bootstrap, opens with a
+// lead-in that ends in a colon. Derived verbatim it becomes a description that
+// stops mid-thought.
+test('a derived description does not end on a lead-in', (root) => {
+  writeFileSync(join(root, 'vault/resources/why-files.md'),
+    '# Why files\n\nHQ stores memory as plain files in git, not a hosted database, because:\n\n- you can read them\n');
+  mkdirSync(join(root, 'vault/areas/ops'), { recursive: true });
+  writeFileSync(join(root, 'vault/areas/ops/summary.md'),
+    '# Ops\n\nDana runs ops. She owns the following:\n\n- billing\n');
+  run(root, ['index']);
+  const rows = read(root, 'vault/index.md').split('\n').filter((l) => l.startsWith('| '));
+  const cell = (link) => rows.find((l) => l.includes(`(${link})`)).split('|')[3].trim();
+  const files = cell('resources/why-files.md');
+  assert(!/[:,;]$/.test(files), `the description ends on punctuation: "${files}"`);
+  assert(!/\bbecause$/.test(files), `the description ends on a dangling connector: "${files}"`);
+  assert(files.startsWith('HQ stores memory as plain files in git'), `the description was gutted: "${files}"`);
+  assert(cell('areas/ops/summary.md') === 'Dana runs ops.', `expected the first sentence, got "${cell('areas/ops/summary.md')}"`);
+});
+
 test('index handles a non-PARA bucket the user added', (root) => {
   mkdirSync(join(root, 'vault/writing/essay-drafts'), { recursive: true });
   writeFileSync(join(root, 'vault/writing/essay-drafts/summary.md'), '# Drafts\n\nEssays in progress.\n');

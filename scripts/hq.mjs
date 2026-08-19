@@ -432,6 +432,25 @@ function existingDescriptions() {
   return out;
 }
 
+// A summary that opens with a lead-in ("…, not a database, because:") derives a
+// description ending mid-thought. Prefer the last complete sentence; failing
+// that, drop the colon and whatever connector it left dangling.
+const DANGLING = /(?:[,;]\s*)?\b(?:because|since|such as|including|like|as|and|or|but|so|with|for|that|which|to|of|in|on|by|from|about|into|namely)$/i;
+
+function tidyDescription(text) {
+  let out = text.replace(/[\s:;,]+$/, '');
+  if (/[:;,]$/.test(text) || DANGLING.test(out)) {
+    const sentence = out.match(/^.*[.!?](?=\s)/);
+    if (sentence && sentence[0].trim().length >= 12) return sentence[0].trim();
+  }
+  let prev = null;
+  while (out !== prev) {
+    prev = out;
+    out = out.replace(DANGLING, '').replace(/[\s:;,]+$/, '');
+  }
+  return out;
+}
+
 function describe(ent) {
   const file = ent.folder ? join(VAULT, ent.path, 'summary.md') : join(VAULT, `${ent.path}.md`);
   if (!existsSync(file)) return '';
@@ -444,7 +463,7 @@ function describe(ent) {
     if (/^[#>]|^---/.test(l)) continue;
     para.push(l);
   }
-  const clean = para.join(' ').replace(/\s+/g, ' ').replace(/\|/g, '\\|').trim();
+  const clean = tidyDescription(para.join(' ').replace(/\s+/g, ' ').replace(/\|/g, '\\|').trim());
   return clean.length > 140 ? `${clean.slice(0, 137).replace(/\s\S*$/, '')}…` : clean;
 }
 

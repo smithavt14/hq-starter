@@ -58,7 +58,7 @@ here; an unconfirmed imported answer is just a plausible-sounding guess with bet
 formatting.
 
 **Identity**
-- Name / preferred address, timezone.
+- Name / preferred address. Take the timezone from the machine (`date`); mention it in passing and correct it only if the user objects, never ask for it.
 - What they do (work, role, or life context) in their own words.
 - 1–2 things they're actively focused on right now.
 

@@ -1,2 +1,5 @@
 .DS_Store
 *.log
+
+# agent-local review state
+*.sidecar.seen*

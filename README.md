@@ -47,7 +47,7 @@ No cloning or downloading required. The whole setup is: open your agent, turn on
 
    > Set up my HQ: a private, file-based memory system for you and me, in a new folder at ~/hq. The instructions live in the repo at https://github.com/smithavt14/hq-starter. Fetch and read https://raw.githubusercontent.com/smithavt14/hq-starter/main/AGENTS.md and follow it start to finish. When it references template files in the starter repo (templates/...), fetch those from the same repo. Interview me before writing anything, exactly as the instructions say.
 
-4. **Answer its questions.** Short, direct things: your name, timezone, what you're working on, how you like to be talked to, anything off-limits, a few people or projects worth knowing upfront.
+4. **Answer its questions.** Short, direct things: your name, what you're working on, how you like to be talked to, anything off-limits, a few people or projects worth knowing upfront.
 
    *Already use Claude (or ChatGPT) with memory turned on?* There's a shortcut: ask the setup agent to "give me the full interview as one block of questions I can paste elsewhere," paste that block into the chat that already knows you, then paste its answers back. You'll confirm and correct rather than typing your life story from scratch. The setup agent knows to treat those answers as drafts, since another assistant's memory of you can be stale or wrong.
 

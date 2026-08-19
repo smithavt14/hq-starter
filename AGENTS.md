@@ -249,7 +249,7 @@ create it at bootstrap; add it when the relaunching pattern actually appears.
 
 ### 3d. `CLAUDE.md` / `AGENTS.md`: the operating manual (written last, references the above)
 
-```markdown
+````markdown
 # {{HQ name}}: Operating Manual
 
 This is {{name}}'s personal workspace and the home of their AI companion. Plain markdown/JSON,
@@ -402,7 +402,7 @@ shows up at least twice, not for one-off tasks.
 
 ---
 *This manual is alive. Update it when the system changes.*
-```
+````
 
 **If Step 5b could not install the CLI** (no Node on the machine), the manual is written the
 same way with three substitutions, and you tell the user plainly that this HQ captures by

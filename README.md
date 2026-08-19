@@ -2,7 +2,7 @@
 
 HQ is a file-based personal memory system for a coding agent, Claude Code, Codex, or anything similar. Point the agent at this repo, answer some questions about yourself, and you get an agent that remembers who you are, what you're working on, and how you like to work, across sessions, without a database, a hosted service, or an app to maintain.
 
-Under the hood it's just markdown and JSON files in a git repo.
+Under the hood it's markdown and JSON files in a git repo, plus one small script the agent calls to write them.
 
 ## Contents
 
@@ -83,12 +83,17 @@ memory/             : one file per day, a raw timeline of what happened
 journal/            : the agent's own occasional reflections, where its voice evolves from
 skills/             : reusable recipes for things you ask the agent to do repeatedly
                       (a session-wrap checkpoint skill is installed from day one)
-TASKS.md            : what's actually in flight right now
+scripts/            : the small command the agent captures through, checks the date
+                      with, and rebuilds the vault index with
+hooks/              : two shell scripts your agent runs itself, one that loads your
+                      files at the start of every session, one that reminds it of
+                      your house writing style
+TASKS.md            : what's in flight, and what's been settled
 ```
 
 Start a new session cold, weeks later, with no conversation history, and the agent should still know who you are, what you're mid-project on, and how you like to work, because it read the files instead of relying on you to re-explain.
 
-It won't be complete after setup. The vault starts with a handful of real entities, not your whole life pre-loaded. You build it out by using the thing, the same way you'd build out any notes system. That's on purpose. Guessing your whole world upfront produces plausible-sounding filler; using it for real produces facts you actually meant to record.
+It won't be complete after setup. The vault starts with a handful of real entities, not your whole life pre-loaded. You build it out by using the thing, the same way you'd build out any notes system. Guessing your whole world upfront produces plausible-sounding filler; using it for real produces facts you actually meant to record.
 
 ## After setup
 
@@ -111,7 +116,7 @@ Coding agents are already good at one thing: reading and writing files. So inste
 - **You can read it.** Nothing is stored in a format only the agent can query. Open any file and you see exactly what it "knows" about you.
 - **You own it.** Switch from Claude Code to Codex, or to whatever comes next, and your memory comes with you. No export, no migration.
 - **It's versioned for free.** Every fact ever written has a git history. Bad edit? Roll it back. Want to know when you decided something? `git log` it.
-- **There's nothing to run.** No server, no schema, no auth layer, no bill. It's a folder.
+- **There's nothing to run.** No server, no schema, no auth layer, no bill. It's a folder, and the one script in it runs when the agent calls it and then stops.
 
 The tradeoff is that it doesn't scale to a team, and it's not trying to. This is a memory system for one person and their agent.
 
@@ -128,6 +133,8 @@ Everything else in the repo (the operating manual, the task list, the skills con
 ## Honest caveats
 
 - This is a personal tool, not a product. There's no support contract, no roadmap promise, no guarantee it fits how you work.
+- **The lessons here are current as of August 2026.** This repo distills one HQ that runs every day, and it's resynced when that system learns something worth passing on. It drifts between resyncs. Check the commit dates.
+- Setup installs a small command the agent uses to capture facts and check dates, and that needs Node 18 or newer. Node is present wherever Claude Code runs, so most people already have it. On a machine without it, setup says so and writes the by-hand instructions into your operating manual instead; everything still works, with more typing and more room for error.
 - It assumes you're comfortable with your agent reading and writing files on your machine, and with git as your backup and sync mechanism.
 - It's opinionated about structure (PARA folders, a specific fact schema, grep-first retrieval). If you want something looser or stricter, fork it and change the rules in `AGENTS.md`. The whole point is that you own it.
 - Nothing here is private by any mechanism stronger than "it's a folder you control." Don't put anything in it you wouldn't want in a git repo.

@@ -43,7 +43,7 @@ leave the structure half-built.
      }
    }
    ```
-   This is a placeholder. Step 1 confirms the real path(s), and Step 1's final instruction has you come back and edit this file. If their work lives in more than one root (e.g. a personal folder and a separate client folder), list all of them in the array. Do not leave the `~/Workspace` placeholder in the shipped repo.
+   This is a placeholder. Step 1 confirms the real path(s), replaces this with the absolute form, and its final instruction has you come back and edit this file. If their work lives in more than one root (e.g. a personal folder and a separate client folder), list all of them in the array. Do not leave the `~/Workspace` placeholder in the shipped repo.
 
 ---
 
@@ -109,7 +109,7 @@ sure that by the end, from sources or from the user, you have all of this:
 - **No GitHub account?** Don't derail the interview to create one. Note sync as deferred, finish the bootstrap local-only (skip the push in Step 6), and point them at the "what GitHub is" section of `guides/your-hq-everywhere.md` for when they're ready. A local-only HQ is fully functional; it just isn't backed up or reachable from other devices yet.
 
 **Before leaving Step 1, do these now, don't defer:**
-- Edit `.claude/settings.json` and replace the `~/Workspace` placeholder with the real path(s) you just confirmed. Add multiple array entries if their work lives in more than one root. A wrong or placeholder path here means future sessions silently can't read their project files.
+- Edit `.claude/settings.json` and replace the `~/Workspace` placeholder with the real path(s) you just confirmed, spelled absolute: `/Users/dana/Workspace`, never `~/Workspace`. A shell expands the tilde, and the settings loader may not, so an entry starting with `~` can resolve to a directory that does not exist. Add multiple array entries if their work lives in more than one root. A wrong or placeholder path here means future sessions silently can't read their project files.
 
 Do not proceed to Step 2 until you have real answers, even partial ones, to every section above. Write down verbatim quotes where useful. They're better raw material for `SOUL.md`/`USER.md` than your paraphrase.
 
@@ -1043,9 +1043,10 @@ sections.
      and write it: `node scripts/hq.mjs note "<fact>" --entity <a seeded entity>`. The
      command re-reads the file and prints the id back. Use a real fact rather than a test
      one, because nothing here is deleted afterwards.
-   - **File access resolves.** `cat .claude/settings.json`, then `ls` the path in
-     `additionalDirectories`. A path that doesn't list means future sessions can't read
-     {{name}}'s project files, and nothing announces that at the time.
+   - **File access resolves.** `cat .claude/settings.json`, confirm every
+     `additionalDirectories` entry starts with `/` rather than `~`, then `ls` each one. A
+     path that doesn't list means future sessions can't read {{name}}'s project files, and
+     nothing announces that at the time.
    - **The wrap skill is discoverable.** `ls -l .claude/skills/session-wrap/SKILL.md` follows
      the symlink and finds the file. In Claude Code, `/session-wrap` should also be offered;
      if it isn't, restart the session once, since the folder didn't exist when the earlier

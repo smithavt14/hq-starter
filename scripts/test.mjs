@@ -298,6 +298,22 @@ test('nothing tells the reader to run a bare hq command', (root) => {
   assert(texts[2].includes('node scripts/hq.mjs help'), 'the unknown-verb error does not spell the real invocation');
 });
 
+// The bootstrap procedure's templates are copied verbatim into a real HQ, so a
+// bare `hq note` written here becomes a command not found in someone's manual.
+// The alias step is the one place allowed to spell the short form, and every
+// line that does so names the alias.
+test('the bootstrap procedure never writes a bare hq command', () => {
+  const doc = join(dirname(CLI), '..', 'AGENTS.md');
+  if (!existsSync(doc)) return;
+  const text = readFileSync(doc, 'utf8');
+  if (!text.includes('HQ Bootstrap Procedure')) return; // an HQ's own manual, not the starter's
+  const offenders = text.split('\n')
+    .map((line, i) => [i + 1, line])
+    .filter(([, line]) => /`hq (now|note|index|help)\b/.test(line) && !line.includes('alias'));
+  assert(offenders.length === 0,
+    `AGENTS.md spells a bare hq command:\n${offenders.map(([n, l]) => `  ${n}: ${l.trim()}`).join('\n')}`);
+});
+
 console.log(`\n${passed} passed, ${failures.length} failed\n`);
 if (failures.length) {
   for (const f of failures) console.log(`  failed: ${f}`);

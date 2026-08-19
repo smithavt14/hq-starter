@@ -329,7 +329,7 @@ people, companies, recurring commitments), `resources/` (reference topics),
 `archives/` (inactive). Entity format and fact schema: `vault/PARA_GUIDE.md`. Start from
 `vault/index.md`.
 
-### Saving memory: `hq note` writes it
+### Saving memory: `node scripts/hq.mjs note` writes it
 
 `node scripts/hq.mjs note --help` prints the routing, the flags, and the fact schema, so
 there is one description of a fact and the manual cannot drift from it.
@@ -363,7 +363,8 @@ entity is three deliberate steps:
 3. `node scripts/hq.mjs index`, so `vault/index.md` lists it.
 
 - Default to capturing, don't ask. Capturing is internal work, never gated on permission.
-- "Mental notes" don't survive. If it matters past this session it goes through `hq note`.
+- "Mental notes" don't survive. If it matters past this session it goes through
+  `node scripts/hq.mjs note`.
 - Nothing is deleted. A fact that changed is superseded, never edited away.
 - Hand-editing `items.json` is the failure mode. It skips the id, the validation, and the
   read-back that proves the write landed. Use the command.
@@ -609,8 +610,8 @@ Append-only array. Never delete an entry: supersede it.
 ```
 - `id` is the fact's address: the entity's folder name plus a three-digit sequence
   continuing from the last entry in this file. `supersededBy` points at one, and so does
-  `hq note supersede`. `node scripts/hq.mjs note` assigns it, which is the reason to capture
-  through the command rather than by hand.
+  `node scripts/hq.mjs note supersede`. The command assigns the id, which is the reason to
+  capture through it rather than by hand.
 - `status: superseded` facts stay in the log forever. They're history, just not current truth.
 - `summary.md` reflects only `active` facts by default.
 - `source` records where a fact came from, so its reliability can be judged later.
@@ -952,7 +953,7 @@ filled in:
 ```
 alias hq='node <hq>/scripts/hq.mjs'
 ```
-The script finds the HQ root from its own location, so `hq now` then works from any
+The script finds the HQ root from its own location, so the alias runs `hq now` from any
 directory. Show them the line and let them add it, or add it on their say-so. The docs keep
 the long spelling either way: an alias lives in one person's shell, and the manual is read by
 agents on machines that have never seen it.

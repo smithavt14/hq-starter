@@ -492,7 +492,9 @@ function help() {
   hq index                regenerate vault/index.md from the vault tree.
 
 Run it as \`node scripts/hq.mjs <verb>\` from the HQ root, or set HQ_ROOT to point
-it at an HQ elsewhere.`);
+it at an HQ elsewhere. There is no \`hq\` binary; the short spelling above is what
+a shell alias gives you (\`alias hq='node <hq>/scripts/hq.mjs'\`), and every doc
+writes the long form so it works before the alias exists.`);
 }
 
 const verb = positional[0];
@@ -500,4 +502,4 @@ if (verb === 'now') cmdNow();
 else if (verb === 'note') cmdNote();
 else if (verb === 'index') cmdIndex();
 else if (!verb || verb === 'help' || has('help')) help();
-else die([`unknown verb "${verb}".`, '', 'Verbs: now · note · index. Run `hq help`.']);
+else die([`unknown verb "${verb}".`, '', 'Verbs: now · note · index. Run `node scripts/hq.mjs help`.']);

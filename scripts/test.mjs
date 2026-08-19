@@ -281,6 +281,23 @@ test('an unknown verb fails loudly', (root) => {
   assert(r.stderr.includes('now'), 'the error does not list the real verbs');
 });
 
+// No `hq` binary is installed anywhere. Any output telling the reader to run one
+// sends them to a command not found, so the help text spells the real call.
+test('nothing tells the reader to run a bare hq command', (root) => {
+  const texts = [
+    run(root, ['help']).stdout,
+    run(root, ['note', '--help']).stdout,
+    run(root, ['sync']).stderr,
+  ];
+  for (const t of texts) {
+    assert(!/\bhq help\b/.test(t), `an instruction sends the reader to "hq help":\n${t}`);
+    assert(!/\bRun `hq\b/.test(t), `an instruction says to run a bare hq command:\n${t}`);
+  }
+  assert(texts[0].includes('node scripts/hq.mjs'), 'help does not spell the real invocation');
+  assert(texts[0].includes('no `hq` binary'), 'help does not say the short spelling is an alias');
+  assert(texts[2].includes('node scripts/hq.mjs help'), 'the unknown-verb error does not spell the real invocation');
+});
+
 console.log(`\n${passed} passed, ${failures.length} failed\n`);
 if (failures.length) {
   for (const f of failures) console.log(`  failed: ${f}`);

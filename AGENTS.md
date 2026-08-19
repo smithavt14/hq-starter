@@ -175,7 +175,7 @@ Create every directory now, even ones that start empty (`vault/archives/`, `vaul
 
 Write these in this order, because each later one references the earlier ones by name. Show each back to the user for correction before treating it as settled. These are living documents, not one-shot outputs.
 
-**Every `{{...}}` in the templates below is a slot you fill, and none of them may survive into a written file.** `{{name}}` becomes the user's name everywhere it appears, `{{tz}}` becomes the timezone, a `{{describe the thing}}` slot becomes the thing described. Grep the finished HQ for `{{` before Step 6; a template brace left in a file is a placeholder a future session will read as content.
+**Every `{{...}}` in a template here is a slot you fill, and none of them may survive into a written file.** This holds for every template in this procedure, the ones below and the `TASKS.md` and skill templates further down. `{{name}}` becomes the user's name everywhere it appears, `{{tz}}` becomes the timezone, a `{{describe the thing}}` slot becomes the thing described. Grep the finished HQ for `{{` before Step 6; a template brace left in a file is a placeholder that a future session reads as content. The one kind that stays is a slot a skill fills when it runs, such as `Session wrap: {{one-line summary}}` in the wrap skill's commit line, which is an instruction rather than a gap.
 
 ### 3a. `SOUL.md`: the agent's own voice/identity
 

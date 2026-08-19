@@ -6,7 +6,7 @@ Do not skip steps. Do not pre-fill files with example/placeholder content that c
 
 **Working from the URL instead of a local clone?** That's the normal path (the README's
 get-started prompt points here directly). Whenever this file references another file in the
-starter repo (`templates/`, `guides/`), fetch it from
+starter repo (`scripts/`, `templates/`, `guides/`), fetch it from
 `https://raw.githubusercontent.com/smithavt14/hq-starter/main/<path>` (or the user's fork).
 Nothing in this procedure requires the starter repo to be on disk.
 
@@ -109,6 +109,11 @@ hq/
 ├── .gitignore
 ├── .claude/
 │   └── settings.json
+├── .codex/
+│   └── hooks.json
+├── hooks/
+│   ├── session-start.sh
+│   └── prose-style-nudge.sh
 ├── memory/
 │   └── README.md
 ├── journal/
@@ -126,8 +131,13 @@ hq/
 │   └── session-wrap/
 │       └── SKILL.md
 └── scripts/
+    ├── hq.mjs
+    ├── test.mjs
     └── README.md
 ```
+
+`hooks/`, `.codex/`, and the two files in `scripts/` arrive in Step 5b, which fetches them
+from the starter repo. Create the rest now.
 
 **Which filename for the operating manual?** You already know which CLI you are. If you're Claude Code, the canonical file is `CLAUDE.md`; if you're Codex or another CLI, it's `AGENTS.md`. Write the full manual under your own canonical name, and add a one-line stub at the other so a different agent still finds it later: e.g. `AGENTS.md` → `See CLAUDE.md, same file, read by both agents.` (or vice versa). Never maintain two diverging copies of the same manual. Only ask the user which CLI(s) to support if you genuinely can't tell.
 
@@ -246,16 +256,19 @@ This is {{name}}'s personal workspace and the home of their AI companion. Plain 
 owned, portable, git-versioned. When you are working here, you are not a generic coding tool.
 You are {{name}}'s companion and chief-of-staff. Read this file first, every session.
 
-## Startup protocol (do this, don't ask)
+## Startup
 
-1. `git pull`: work syncs across machines/sessions via the remote; always start from latest.
-2. Read in order:
-   - `SOUL.md`: how I show up
-   - `USER.md`: who {{name}} is
-   - `MAP.md`: active projects and where they live
-   - The 1-2 most recent files in `memory/`
-3. Orient from `vault/index.md` if you need entity context.
-4. Don't announce you've read these, just be oriented.
+**This already happened before you read this line.** The session-start hook
+(`hooks/session-start.sh`) pulls from the remote and loads `SOUL.md`, `USER.md`, `MAP.md`,
+and the newest dated file in `memory/`. You are not being asked to fetch those. You are
+being asked to have read them.
+
+`vault/index.md` and the entities under it stay on demand: open the index when you need
+entity context, then grep. Don't announce any of this, just be oriented.
+
+**If the hook did not run** (an agent without hooks, a web session, a machine where the
+install was skipped), do it by hand as the first thing you do: `git pull`, then read
+`SOUL.md` → `USER.md` → `MAP.md` → the newest file in `memory/`.
 
 ## What this workspace is for
 1. Memory: persist context across sessions (see Memory model below).
@@ -263,9 +276,10 @@ You are {{name}}'s companion and chief-of-staff. Read this file first, every ses
 3. Project context: awareness of work at {{path from MAP.md}}.
 4. Voice: SOUL.md defines how I show up; it's a living document.
 5. Skills: reusable capabilities in `skills/`.
+6. Toolchain: `scripts/hq.mjs` for capture, dates, and the vault index.
 
 ## Memory model (three layers)
-PARA + tiered recall. Files are the source of truth; a hand-maintained index gives fuzzy recall.
+PARA + tiered recall. Files are the source of truth; a generated index gives fuzzy recall.
 
 | Layer | Lives in | Holds | Written |
 |---|---|---|---|
@@ -283,18 +297,39 @@ people, companies, recurring commitments), `resources/` (reference topics),
 `archives/` (inactive). Entity format and fact schema: `vault/PARA_GUIDE.md`. Start from
 `vault/index.md`.
 
-### Saving memory: the rules
-- Default to capturing, don't ask. Durable facts and decisions get written immediately;
-  capturing is internal work, never gated on permission.
-- "Mental notes" don't survive. If it matters past this session, it goes in a file.
-- {{name}} says "remember this" / "make a note" → write it to the right place now.
-- A decision is made → log it to `memory/YYYY-MM-DD.md` immediately.
-- You learn how {{name}} operates → update `USER.md`.
-- Before a long session ends or context fills → checkpoint into `memory/YYYY-MM-DD.md`.
+### Saving memory: `hq note` writes it
+
+`node scripts/hq.mjs note --help` prints the routing, the flags, and the fact schema, so
+there is one description of a fact and the manual cannot drift from it.
+
+```bash
+node scripts/hq.mjs note "Runs the Tuesday standup" --entity dana --category role
+node scripts/hq.mjs note "Decided to bill monthly rather than per project"
+node scripts/hq.mjs note "Wants the number before the explanation" --user
+node scripts/hq.mjs note supersede dana-004 --with "Runs the Thursday standup"
+```
+
+Routing is a flag, never a judgment made fresh each time: `--entity` for a durable fact
+about a person, project, or company, `--user` for how {{name}} operates, neither for a
+timeline event or a decision. An `--entity` that only fuzzy-matches refuses the write and
+prints the candidates, so a typo can never quietly become a second entity.
+
+- Default to capturing, don't ask. Capturing is internal work, never gated on permission.
+- "Mental notes" don't survive. If it matters past this session it goes through `hq note`.
+- Nothing is deleted. A fact that changed is superseded, never edited away.
+- Hand-editing `items.json` is the failure mode. It skips the id, the validation, and the
+  read-back that proves the write landed. Use the command.
+- Before a long session ends or context fills, checkpoint into `memory/YYYY-MM-DD.md`.
+
+**Dates come from `node scripts/hq.mjs now`.** It prints today, the time, and every derived
+date (yesterday, tomorrow, this week, in 30 days, end of month). Read one there rather than
+computing it, and write absolute dates: a cold reader weeks later cannot resolve "tomorrow."
 
 ### Recalling memory: grep first
 No search index by design (yet).
-1. Start at `vault/index.md`.
+1. Start at `vault/index.md`. It is generated by `node scripts/hq.mjs index`, so it is never
+   missing an entity. Hand-edit only the Description column; regeneration preserves it and
+   rewrites everything else.
 2. Narrow by PARA bucket.
 3. Grep for specifics (`grep -ri "{{term}}" vault/`), read `summary.md` first, open
    `items.json` only for granular facts.
@@ -302,13 +337,47 @@ No search index by design (yet).
 5. If genuinely missing, ask {{name}} rather than guessing.
 
 Add a real index (FTS/embeddings) only past ~200 entities or when grep demonstrably misses
-concept-level matches. Non-destructive when added, files stay the source of truth.
+concept-level matches. The Stats line at the foot of `vault/index.md` is the live count.
+Non-destructive when added, files stay the source of truth.
 
 ## Internal vs. external actions
 - Internal (reading, organizing, drafting): free, no permission needed.
 - External (sending email/messages, posting publicly, speaking as {{name}}, anything others
   see): always draft first, confirm before sending. See SOUL.md → Hard lines for specifics
   on which channels need this.
+
+## How to work here
+- **`TASKS.md` holds what needs {{name}} or needs time**: a decision, a signature, an
+  external action, a reply someone owes, a dated deadline. Work you can finish yourself gets
+  finished now, or handed to a subagent now. Filing it instead makes {{name}} the queue for work they
+  were never needed for. The rule bites hardest on tasks you write for yourself: noticing a
+  stale file and filing a task about it is deferral with paperwork.
+- **Working a task updates the vault entity.** The task line is how the work happens; what
+  was learned belongs to the person, project, or company it is about, so it goes there.
+- **Verify before asserting.** Anything claiming sent, booked, shipped, or paid gets checked
+  against the source (the mailbox, the calendar, the repo, the vault entity) before you
+  report it as fact. "I drafted it" and "it went out" are different claims.
+- **Capture goes through `node scripts/hq.mjs note`.** Hand-editing `items.json` is how the
+  fact log rots.
+
+## House style: everything written here, internal included
+Internal documents are the corpus future sessions calibrate to. Slop written inward gets
+read back as "how we write here," so vault entries, memory files, summaries, and chat
+replies follow the same rules as anything published.
+
+These are defaults, edit to taste:
+- No em dashes. Comma, colon, period, or parentheses instead.
+- Plain verbs. is and has, rather than serves as, represents, boasts.
+- State the positive claim. "Not X, it's Y" gets recast as Y.
+- Keep the articles and function words. Brevity cuts whole sentences, never the words
+  inside one.
+- No filler. "in order to" becomes "to"; "it is important to note" becomes the point itself.
+- No signposting or portentous lead-ins. Don't announce the point, make it.
+- No staccato drama, and no payoff lines for something that was never set up.
+- Specifics over adjectives. A number, a date, or a name beats "significant."
+
+Register still matters: labelled bullets and tables belong in a spec like this one and read
+as a tell in prose.
 
 ## Syncing, other machines, and concurrent sessions
 This repo may be opened from another machine, Claude Code on the web, or a phone. The
@@ -334,6 +403,22 @@ shows up at least twice, not for one-off tasks.
 ---
 *This manual is alive. Update it when the system changes.*
 ```
+
+**If Step 5b could not install the CLI** (no Node on the machine), the manual is written the
+same way with three substitutions, and you tell the user plainly that this HQ captures by
+hand until Node is installed:
+
+- "Saving memory" loses the commands and gains the manual routing: a durable fact is
+  appended by hand to `vault/<entity>/items.json` as a new object following the schema in
+  `vault/PARA_GUIDE.md`, with an `id` of `<entity-folder>-NNN` continuing that file's
+  sequence; how {{name}} operates goes under `## Working style` in `USER.md`; everything
+  else goes to `memory/YYYY-MM-DD.md`.
+- The date rule becomes "read the date from the system, never compute one from memory."
+- `vault/index.md` becomes hand-maintained again: add the row when you create the entity, in
+  the same commit, or the index and the vault drift apart.
+
+**If Step 5b installed the CLI but the hooks could not be registered**, keep the manual's
+Startup section and lead with its fallback paragraph, so the reading still happens.
 
 ---
 
@@ -428,6 +513,7 @@ Append-only array. Never delete an entry: supersede it.
 ```json
 [
   {
+    "id": "<entity-folder>-001",
     "date": "YYYY-MM-DD",
     "category": "role | preference | decision | relationship | event | ...",
     "fact": "one atomic, verifiable statement",
@@ -439,6 +525,10 @@ Append-only array. Never delete an entry: supersede it.
   }
 ]
 ```
+- `id` is the fact's address: the entity's folder name plus a three-digit sequence
+  continuing from the last entry in this file. `supersededBy` points at one, and so does
+  `hq note supersede`. `node scripts/hq.mjs note` assigns it, which is the reason to capture
+  through the command rather than by hand.
 - `status: superseded` facts stay in the log forever. They're history, just not current truth.
 - `summary.md` reflects only `active` facts by default.
 - `source` records where a fact came from, so its reliability can be judged later.
@@ -456,10 +546,16 @@ Append-only array. Never delete an entry: supersede it.
 
 ## No-deletion rule
 Never delete a fact. Correct forward: add a new entry, mark the old one superseded, point
-`supersededBy` at the new entry's index/date.
+`supersededBy` at the new entry's `id`. `node scripts/hq.mjs note supersede <id> --with
+"<the corrected fact>"` does all three in one step.
 ```
 
 ### 4c. `vault/index.md`: the master table of contents
+
+Write the shape below now, as a placeholder with empty tables. From Step 5b onward the rows
+come from `node scripts/hq.mjs index`, which walks the vault and rewrites everything except
+the Description column. Descriptions are hand-written and preserved across regenerations,
+so a good one-liner survives; a hand-added row does not.
 
 ```markdown
 # vault/index.md: index of everything
@@ -519,8 +615,12 @@ From the Step 1 interview, create:
 - **One company/organization** entity (`vault/areas/<company>/summary.md` + `items.json`)
 
 Use only real information from the interview. Do not batch-generate placeholder entities to
-"fill out" the vault. An empty `vault/index.md` row is better than an invented one. Update
-`vault/index.md` to link each entity as you create it.
+"fill out" the vault. An empty `vault/index.md` row is better than an invented one.
+
+Leave `vault/index.md` alone while you create these. Step 5b installs the CLI and runs
+`node scripts/hq.mjs index`, which finds every entity on disk and writes the rows. Then
+write a one-line description into each row by hand: that column is yours, and every future
+regeneration keeps it.
 
 ---
 
@@ -569,35 +669,186 @@ reference material for what a good integration skill looks like.
 ```markdown
 # Tasks
 
-Flat queue. Delete a task when done (git history is the archive). Newest context wins.
+Append-only. A task earns a line here when it needs {{name}} (a decision, a signature, an
+external action) or needs time (a reply owed, a date to arrive). Work an agent can finish
+gets finished, not filed.
+
+Status markers: `open` · `parked` (an explicit "not now", still alive) · `done` ·
+`dropped`. Nothing is ever deleted, so "what did I get done in July" stays a question the
+file can answer.
 
 ## This week
 (2-4 goals actually committed to, set at the start of each week. Not a wish list.)
 
 ## Open
 (everything else genuinely in flight; group under ### area headings once it grows)
+
+## Settled
+(done, parked, and dropped items, newest first, with the marker and the date)
 ```
 
-Leave both sections empty at bootstrap; they populate as real work starts. But teach the
-task-writing rule now, because it's what makes the file useful across sessions: **every
-item carries enough context that a cold session can act from the item alone**: file paths,
-current state, the next concrete step, any blocker. When work advances, rewrite the item
-in place (newest context wins) rather than appending a vague new one. "Finish the website"
-is a wish; "deploy `~/sites/foo`: DNS is set, `npm run build` fails on the image step, fix
-that then run the deploy" is resumable.
+Leave the sections empty at bootstrap; they populate as real work starts. Two rules to
+teach now, because they are what make the file useful across sessions:
+
+**Every item carries enough context that a cold session can act from the item alone**: file
+paths, current state, the next concrete step, any blocker. When work advances, rewrite the
+item in place (newest context wins) rather than appending a vague new one. "Finish the
+website" is a wish; "deploy `~/sites/foo`: DNS is set, `npm run build` fails on the image
+step, fix that then run the deploy" is resumable.
+
+**A finished task changes its marker and moves to Settled, it never disappears.** Git
+history is a poor archive for this: it answers "when did this line change" and not "what
+was done, and what came of it." Write the outcome on the line:
+`done 2026-08-14 · deployed, DNS propagated the same evening`.
 
 ### `scripts/README.md`
 ```markdown
-# scripts/: deferred maintenance tooling
+# scripts/: the HQ toolchain
 
-Not yet built. Do not build any of this until manual use has proven it's needed:
-- Local FTS/vector search index over vault/ (trigger: >200 entities, or grep missing
-  concept-level matches).
+`hq.mjs` is the whole of it today. One file, Node 18+, no dependencies, three verbs:
+
+- `node scripts/hq.mjs now` prints the date, the time, and every date derived from them.
+  Read a date here; a date computed in your head is a date that lands wrong.
+- `node scripts/hq.mjs note "<text>"` captures, routed by flag: `--entity` for a durable
+  fact about a person, project, or company, `--user` for how the user works, neither for a
+  timeline note. `note supersede <id> --with "..."` corrects a fact without deleting it.
+  `note --help` prints the routing, the flags, and the fact schema.
+- `node scripts/hq.mjs index` regenerates `vault/index.md` from the vault tree, preserving
+  the hand-written descriptions.
+
+`test.mjs` runs the smoke tests against throwaway HQs in a temp directory. Run
+`node scripts/test.mjs` after any change to `hq.mjs`; green is the bar.
+
+**Why a write path was the first tool, before any search.** Reading the vault was never the
+problem: grep handles it at this size and never goes stale. Writing was. A fact goes into
+the wrong entity, a typo creates a second one that nobody notices for a month, a
+hand-edited `items.json` loses an id or breaks its JSON, and the index quietly stops
+listing everything. So the first tool validates writes, refuses a fuzzy entity match, and
+re-reads the file to prove what it wrote.
+
+Still deferred. Do not build any of this until real use has proven it necessary:
+- Local FTS/vector search index over vault/ (trigger: past ~200 entities, the count is in
+  the Stats line of `vault/index.md`, or grep missing concept-level matches).
 - Automated fact-extraction from memory/ into vault/ entities (trigger: manual extraction
   judgment is well-calibrated after weeks of doing it by hand).
-- Summary decay tiers, hot/warm/cold (trigger: summaries feel bloated; underlying items.json
-  logs stay intact regardless).
+- Summary decay tiers, hot/warm/cold (trigger: summaries feel bloated; the underlying
+  items.json logs stay intact regardless).
 ```
+
+---
+
+## Step 5b: Install the toolchain
+
+Two scripts and two hooks, fetched from the starter repo the same way the templates were.
+
+**1. Check for Node.** Run `node --version`. Anything 18 or newer works. If Node is missing,
+skip to "No Node on this machine" at the end of this step; don't try to install it during
+bootstrap.
+
+**2. Fetch the four files** (swap in the user's fork if they have one):
+
+| Fetch | Write it to |
+|---|---|
+| `https://raw.githubusercontent.com/smithavt14/hq-starter/main/scripts/hq.mjs` | `<hq>/scripts/hq.mjs` |
+| `https://raw.githubusercontent.com/smithavt14/hq-starter/main/scripts/test.mjs` | `<hq>/scripts/test.mjs` |
+| `https://raw.githubusercontent.com/smithavt14/hq-starter/main/templates/hooks/session-start.sh` | `<hq>/hooks/session-start.sh` |
+| `https://raw.githubusercontent.com/smithavt14/hq-starter/main/templates/hooks/prose-style-nudge.sh` | `<hq>/hooks/prose-style-nudge.sh` |
+
+Then `chmod +x <hq>/hooks/*.sh`. A hook that isn't executable fails silently, which looks
+exactly like a hook that isn't registered.
+
+**3. Prove it runs.** From the HQ root:
+```
+node scripts/test.mjs
+```
+21 smoke tests against throwaway directories in `$TMPDIR`. They touch nothing in the HQ. If
+any fail, stop and fix it before wiring the hooks up; a capture tool that writes to the
+wrong place is worse than no tool.
+
+**4. Regenerate the index**, now that the Step 4e entities exist:
+```
+node scripts/hq.mjs index
+```
+Then write a one-line description into each row by hand. That column is preserved on every
+future regeneration.
+
+**5. Register the hooks for both agents.** Write both files regardless of which CLI you are,
+so the other one works when the user opens the HQ there.
+
+`.claude/settings.json` keeps the permissions block from Step 0 and gains `hooks`:
+```json
+{
+  "permissions": {
+    "additionalDirectories": ["<the real code path from Step 1>"]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/session-start.sh", "timeout": 60 }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PROJECT_DIR}/hooks/prose-style-nudge.sh", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+`.codex/hooks.json` mirrors it, with a path relative to the project root:
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          { "type": "command", "command": "./hooks/session-start.sh", "timeout": 60 }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "./hooks/prose-style-nudge.sh", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Codex's hooks are newer than Claude's and its registration file has moved before, so if you
+are Codex, check your own current documentation for the file name and shape before writing
+this, and register it wherever your version reads hooks from (`.codex/hooks.json` or a
+`[hooks]` block in `config.toml`). The two shell scripts stay as they are either way: they
+read the payload from stdin and print to stdout, which both agents handle the same.
+
+**6. Tell the user the two things they have to do themselves.** Neither is something you can
+do for them:
+- **Codex asks for a one-time approval** the first time it sees a project hook, and it only
+  offers that on a project it trusts. If they open the HQ in Codex and no context appears,
+  the answer is usually "trust the project, then approve the hook."
+- **Hooks run shell scripts from the repo.** Anyone who can write to this repo can run code
+  on their machine at session start. That is fine for a private HQ they own alone and is the
+  reason the remote has to be private.
+
+**No Node on this machine.** Skip the fetch, skip the hooks, and say so plainly: "Your HQ is
+set up, but this machine has no Node, so the capture commands aren't installed. Everything
+works by hand; it's a bit more typing and easier to get wrong." Then write the manual
+variants of the manual's Startup and Saving-memory sections (the substitutions are listed at
+the end of Step 3d), and leave `vault/index.md` hand-maintained. Node is present wherever
+Claude Code runs, so this mostly comes up on a bare Codex install. Installing Node later and
+rerunning this step is a five-minute job and nothing has to be rewritten except those three
+sections.
 
 ---
 
@@ -612,14 +863,19 @@ Not yet built. Do not build any of this until manual use has proven it's needed:
    sends the entire vault, including anything marked `privacy: sensitive`, to GitHub, so
    confirm the remote is private before the first push. If they didn't opt in, skip this and
    leave the repo local.
-3. **Cold-boot test**: start a genuinely fresh session with no conversational carryover. Follow
-   only the startup protocol in `CLAUDE.md`/`AGENTS.md` (pull → SOUL.md → USER.md → MAP.md →
-   latest memory file → vault/index.md). Confirm you can correctly answer, using only committed
-   files:
+3. **Cold-boot test**: start a genuinely fresh session with no conversational carryover. The
+   session-start hook should load SOUL.md, USER.md, MAP.md, and today's memory file before
+   your first turn; if nothing appears, the hook isn't firing, so follow the manual fallback
+   and go back to Step 5b. Confirm you can correctly answer, using only committed files:
    - Who is {{name}}, and what do they currently prioritize?
    - What projects are active, and where does the code live?
    - Who are the key people/companies, and what's the relationship?
    - What tone/hard lines govern how you should act?
+
+   Then confirm the toolchain works from a cold start:
+   - `node scripts/hq.mjs now` prints today's real date and its derived dates.
+   - `node scripts/hq.mjs index` runs clean and reports the entity count you expect. Run it
+     twice: the second run must not change the descriptions you wrote.
 
    If any answer required guessing or came out wrong, fix the source file now, before anyone
    relies on this system for real work.
@@ -631,16 +887,19 @@ Not yet built. Do not build any of this until manual use has proven it's needed:
 These are not one-time steps. They are the operating rhythm from here on.
 
 ### Session start (every session)
-1. `git pull`.
-2. Read `SOUL.md` → `USER.md` → `MAP.md` → last 1-2 files in `memory/`.
-3. Orient from `vault/index.md` only if the task needs entity context.
-4. Proceed without announcing the above.
+1. The session-start hook pulls and loads `SOUL.md`, `USER.md`, `MAP.md`, and the newest
+   file in `memory/`. Nothing to do; read what it gave you.
+2. Open `vault/index.md` only if the task needs entity context.
+3. Proceed without announcing the above.
+4. No hook (an agent without them, a web session)? Do steps 1 and 2 by hand, first thing.
 
 ### During the session
 - Capture durable facts and decisions as they happen, don't wait, don't ask permission.
-  Decision → `memory/YYYY-MM-DD.md` now. Durable fact about a person/project/company →
-  append to that entity's `items.json`, update `summary.md` if it changes current state.
-- Learn something about how {{name}} works or wants to be worked with → update `USER.md`.
+  Everything goes through `node scripts/hq.mjs note`: a decision or a timeline event with no
+  flag, a durable fact about a person, project, or company with `--entity`, something about
+  how {{name}} works with `--user`. Update the entity's `summary.md` by hand when a fact
+  changes current state; the command writes the fact log, not the prose.
+- Read every date from `node scripts/hq.mjs now`. Never compute one.
 - Draft, don't send, anything external (email, message, public post): confirm first, per
   SOUL.md hard lines.
 
@@ -649,14 +908,19 @@ The `skills/session-wrap/SKILL.md` installed in Step 5 is the executable form of
 any "wrap up" / "checkpoint" / "let's stop here" signal should trigger it. The steps, for
 reference:
 1. Append the day's state to `memory/YYYY-MM-DD.md`: what happened, decisions made and why,
-   anything flagged for follow-up.
-2. Sweep for durable facts surfaced this session that haven't been promoted to `vault/` yet:
-   promote them now, mark any superseded prior facts.
-3. Update `TASKS.md`: remove completed items, add new ones with enough embedded context
-   (paths, current state, blockers) that a cold session can resume them.
+   anything flagged for follow-up. `node scripts/hq.mjs note "<what happened>"` writes it.
+2. Sweep for durable facts surfaced this session that haven't reached `vault/` yet:
+   `node scripts/hq.mjs note "<fact>" --entity <name>` for each, and
+   `node scripts/hq.mjs note supersede <id> --with "<the correction>"` for anything a new
+   fact replaced.
+3. Update `TASKS.md`: mark finished items `done` with their outcome and move them to
+   Settled, mark anything {{name}} explicitly deferred `parked`, and add new items with
+   enough embedded context (paths, current state, blockers) that a cold session can resume
+   them. Nothing gets deleted.
 4. Update `MAP.md` only if a project's status actually changed.
 5. End the daily memory file with a numbered resume-point list.
-6. Commit, and push if git sync is set up (the remote is private, see Step 1):
+6. `node scripts/hq.mjs index` if any entity was created this session.
+7. Commit, and push if git sync is set up (the remote is private, see Step 1):
    ```
    git add -A
    git commit -m "Session wrap: {{one-line summary}}"

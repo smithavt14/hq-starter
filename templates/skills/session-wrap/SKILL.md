@@ -27,13 +27,13 @@ Write for a cold reader. The next session has no context. A good wrap leaves a r
 
 ## Workflow
 
-1. **`git pull --rebase` first.** HQ syncs across machines and sessions via the remote; start the wrap from latest so the push doesn't get rejected. (No remote set up? Skip this and step 7's push, and just commit locally.)
+1. **`git pull --rebase` first.** HQ syncs across machines and sessions via the remote; start the wrap from latest so the push doesn't get rejected. (No remote set up? Skip this and step 8's push, and just commit locally.)
 
-2. **Log to `memory/YYYY-MM-DD.md`.** Append to today's file, don't overwrite it. Capture: what happened, every decision made *and why*, dead ends (so they aren't retried), and the pause point: exactly where work stopped and the next concrete action. Reference file paths, not vibes.
+2. **Log to `memory/YYYY-MM-DD.md`.** `node scripts/hq.mjs note "<what happened>"` appends to today's file; writing by hand works too, as long as it appends. Capture: what happened, every decision made *and why*, dead ends (so they aren't retried), and the pause point: exactly where work stopped and the next concrete action. Reference file paths, not vibes.
 
-3. **Promote durable facts to `vault/`.** If something lasting was learned about an entity (a person, project, company, area), update its `summary.md` / `items.json` per `vault/PARA_GUIDE.md`, superseding any facts it replaces. Skip if nothing durable changed. Don't duplicate the timeline here: vault holds lasting facts, memory/ holds the episodic record.
+3. **Promote durable facts to `vault/`.** If something lasting was learned about an entity (a person, project, company, area), capture it with `node scripts/hq.mjs note "<fact>" --entity <name>`, and `node scripts/hq.mjs note supersede <id> --with "<the correction>"` for anything a new fact replaced. Then edit `summary.md` by hand where current state changed; the command writes the fact log, not the prose. Skip if nothing durable changed. Don't duplicate the timeline here: vault holds lasting facts, memory/ holds the episodic record. (No CLI installed? Append to `items.json` by hand per `vault/PARA_GUIDE.md`, continuing the file's `id` sequence.)
 
-4. **Update `TASKS.md`.** Remove completed items (git history is the archive). Add or rewrite open tasks so each carries enough context to act on cold: file paths, current state, the next step, blockers. Newest context wins; expand the relevant existing task rather than appending a vague new one.
+4. **Update `TASKS.md`.** Mark what finished `done` with its outcome and move it to Settled, mark anything {{name}} explicitly deferred `parked`, and add or rewrite open tasks so each carries enough context to act on cold: file paths, current state, the next step, blockers. Nothing is deleted. Newest context wins; expand the relevant existing task rather than appending a vague new one.
 
 5. **Update `USER.md` / `SOUL.md` only if a real pattern emerged** about how {{name}} operates or how the companion should show up. Rare. Most sessions don't touch these.
 
@@ -43,7 +43,9 @@ Write for a cold reader. The next session has no context. A good wrap leaves a r
    - Security items: API keys or secrets pasted in chat or written anywhere, anything to rotate or restrict.
    - Pending external actions (drafts unsent, posts unposted): list them, don't perform them as part of the wrap.
 
-7. **Commit and push.** From the HQ root: `git add -A`, commit with a session-checkpoint message (`Session wrap: {{one-line summary}}`; this convention makes `git log` a readable session index for free), then push. If the push is rejected, `git pull --rebase` and retry. Never commit secrets; they don't belong in HQ at all.
+7. **Regenerate the index if the vault grew.** `node scripts/hq.mjs index` after any session that created an entity, so `vault/index.md` lists it. The command preserves the hand-written descriptions; write one for each new row before committing.
+
+8. **Commit and push.** From the HQ root: `git add -A`, commit with a session-checkpoint message (`Session wrap: {{one-line summary}}`; this convention makes `git log` a readable session index for free), then push. If the push is rejected, `git pull --rebase` and retry. Never commit secrets; they don't belong in HQ at all.
 
 ## Output format
 

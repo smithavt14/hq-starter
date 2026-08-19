@@ -1030,7 +1030,7 @@ sections.
    your first turn; if nothing appears, the hook isn't firing, so follow the manual fallback
    and go back to Step 5b. Confirm you can correctly answer, using only committed files:
    - Who is {{name}}, and what do they currently prioritize?
-   - What projects are active, and where does the code live?
+   - What projects are active, and where do their project files live?
    - Who are the key people/companies, and what's the relationship?
    - What tone/hard lines govern how you should act?
 
@@ -1051,10 +1051,13 @@ sections.
      the symlink and finds the file. In Claude Code, `/session-wrap` should also be offered;
      if it isn't, restart the session once, since the folder didn't exist when the earlier
      one started.
-   - **The prose hook speaks.** Pipe it a payload by hand:
-     `echo '{"session_id":"cold-boot","tool_input":{"file_path":"/tmp/draft-check.md"}}' | ./hooks/prose-style-nudge.sh`
-     It must print one line of JSON containing `additionalContext`. Silence means it is
-     inert, and an inert PostToolUse hook looks exactly like a working one from the outside.
+   - **The prose hook speaks.** Clear its markers, then pipe it a payload by hand:
+     `rm -f "${TMPDIR:-/tmp}"/hq-prose-nudge-*; echo '{"session_id":"cold-boot","tool_input":{"file_path":"/tmp/draft-check.md"}}' | ./hooks/prose-style-nudge.sh`
+     It must print one line of JSON containing `additionalContext`. The hook nudges once per
+     session and file and leaves a marker in `$TMPDIR` to remember, and that marker outlives
+     this check, so the `rm` is what keeps the command truthful the second time anyone runs
+     it. Silence means the hook is inert, and an inert PostToolUse hook looks exactly like a
+     working one from the outside.
 
    **Without Node**, the first three of those checks have no command behind them. Check the
    same four things by hand:
@@ -1073,6 +1076,16 @@ sections.
 
    If any answer required guessing or came out wrong, fix the source file now, before anyone
    relies on this system for real work.
+4. **Commit what the cold-boot test wrote.** The checks above left real files behind: the
+   captured fact, the regenerated `vault/index.md`, today's entry in `memory/`. A second
+   commit is the right shape for it, since the first one is the bootstrap and this is the
+   proof it runs:
+   ```
+   git add -A
+   git commit -m "Cold-boot check: first fact captured, index regenerated"
+   ```
+   Push it as well if the remote from step 2 exists. Bootstrap ends with a clean
+   `git status`; anything still uncommitted here is work the next session cannot see.
 
 ---
 

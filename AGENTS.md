@@ -878,7 +878,7 @@ exactly like a hook that isn't registered.
 ```
 node scripts/test.mjs
 ```
-22 smoke tests against throwaway directories in `$TMPDIR`. They touch nothing in the HQ. If
+26 smoke tests against throwaway directories in `$TMPDIR`. They touch nothing in the HQ. If
 any fail, stop and fix it before wiring the hooks up; a capture tool that writes to the
 wrong place is worse than no tool.
 
@@ -1093,7 +1093,7 @@ sections.
 
 These are not one-time steps. They are the operating rhythm from here on.
 
-**Without Node the rhythm is identical and the commands are not**, so substitute throughout:
+**Without Node, the same rhythm runs on by-hand substitutions.** Throughout:
 `note` becomes appending by hand (a durable fact to the entity's `items.json` with the next
 id in its sequence, a working habit to `## Working style` in `USER.md`, everything else to
 `memory/YYYY-MM-DD.md`), `now` becomes `date +%F`, and `index` becomes writing the

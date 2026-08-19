@@ -664,6 +664,12 @@ Read this first. Narrow into a bucket, then grep, then read summary.md.
 |---|---|---|
 ```
 
+**Without Node**, nothing ever regenerates this file, so it is written from the template
+above and maintained by hand from here on: one row per entity, added in the same commit that
+creates the entity, or the index and the vault drift apart. The Summary cell links to the
+entity's `summary.md` relative to `vault/`, e.g. `[summary](areas/people/dana/summary.md)`,
+and the Description cell holds a line you write yourself.
+
 ### 4d. `vault/resources/memory-architecture.md`: rationale, so it's never re-litigated
 
 ```markdown
@@ -707,6 +713,15 @@ index derives that entity's description from it.
 
 Leave `vault/index.md` alone while you create these. Step 5b runs the index command, which
 finds every entity on disk and writes the rows.
+
+**Without Node**, there is no command coming, so fill the fact logs here instead. Append
+each fact by hand to that entity's `items.json` as an object with every field in the
+`vault/PARA_GUIDE.md` schema, ids running `<entity-folder>-001`, `-002`, `-003` in file
+order (`dana-001` for the first fact about `areas/people/dana`). Two or three facts each,
+atomic, `"source": "conversation"`, and `"status": "active"` with `"supersededBy": null`.
+Check the file still parses afterwards (`python3 -m json.tool vault/<bucket>/<entity>/items.json`,
+or read it), because a stray comma costs the whole fact log. Then write the `vault/index.md`
+rows by hand, per 4c.
 
 ---
 
@@ -874,7 +889,8 @@ up about that person, project, or company. Aim for two or three each, atomic (a 
 an "and" is two facts), with `--category` set and `--source conversation`. Use `--related`
 where a fact genuinely involves a second entity, and `--privacy sensitive` for anything
 health, financial, or legal. This is also the first proof the capture path works end to end
-on this machine.
+on this machine. **Without Node** the facts went in by hand back in Step 4e, so there is
+nothing to do here beyond checking that each seeded `items.json` still parses.
 
 **5. Regenerate the index**, now that the Step 4e entities exist:
 ```
@@ -882,7 +898,9 @@ node scripts/hq.mjs index
 ```
 It derives each description from that entity's `summary.md`. Read the result, and rewrite a
 description by hand only where the derived one reads badly. Whatever the cell holds now is
-preserved on every future run.
+preserved on every future run. **Without Node**, the rows are the ones you wrote by hand in
+4e, so check them instead: one row per entity folder on disk, and every link pointing at a
+`summary.md` that exists.
 
 **6. Register the hooks for both agents.** Write both files regardless of which CLI you are,
 so the other one works when the user opens the HQ there.
@@ -1037,6 +1055,21 @@ sections.
      It must print one line of JSON containing `additionalContext`. Silence means it is
      inert, and an inert PostToolUse hook looks exactly like a working one from the outside.
 
+   **Without Node**, the first three of those checks have no command behind them. Check the
+   same four things by hand:
+   - **The date is read, not recalled.** `date +%F` prints today, and today's file in
+     `memory/` is filed under that date.
+   - **Every seeded fact log parses.** `python3 -m json.tool vault/<bucket>/<entity>/items.json`
+     prints the array back for each seeded entity, or read the file and confirm it holds
+     complete records. A stray comma silently costs the whole log.
+   - **The index rows point at real paths.** Every `[summary](...)` link in `vault/index.md`
+     resolves (`ls vault/<the linked path>` for each), and every entity folder on disk has a
+     row.
+   - **Capture lands.** Append one real fact from the interview to a seeded `items.json`,
+     with the next id in that file's sequence, then reparse the file.
+
+   The file-access, wrap-skill, and prose-hook checks are unchanged; none of them needs Node.
+
    If any answer required guessing or came out wrong, fix the source file now, before anyone
    relies on this system for real work.
 
@@ -1045,6 +1078,12 @@ sections.
 ## Step 7: Establish the ongoing habits
 
 These are not one-time steps. They are the operating rhythm from here on.
+
+**Without Node the rhythm is identical and the commands are not**, so substitute throughout:
+`note` becomes appending by hand (a durable fact to the entity's `items.json` with the next
+id in its sequence, a working habit to `## Working style` in `USER.md`, everything else to
+`memory/YYYY-MM-DD.md`), `now` becomes `date +%F`, and `index` becomes writing the
+`vault/index.md` row in the same commit that creates the entity.
 
 ### Session start (every session)
 1. The session-start hook pulls and loads `SOUL.md`, `USER.md`, `MAP.md`, and the newest

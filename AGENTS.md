@@ -19,8 +19,11 @@ leave the structure half-built.
 
 ## Step 0: Before any content exists
 
-1. Choose a root directory (e.g. `~/hq`). Confirm it doesn't already exist or already contain a git repo before you `git init`. You're bootstrapping from nothing, not on top of something.
-2. Write `.gitignore` **first**, before any other file touches disk:
+1. **Choose a root directory (e.g. `~/hq`), and confirm you can write to it before anything else.** `cd` to it (create it first, `mkdir -p ~/hq`), and check it doesn't already exist as a git repo before you `git init`. You're bootstrapping from nothing, not on top of something.
+
+   An agent started inside some other folder is usually scoped to that folder, so writes to `~/hq` get refused or prompted one at a time and the scaffold ends up half-built. If that's what you're seeing, say so and ask the user to grant access to the home folder, `/add-dir ~` in Claude Code, or to close the session and reopen the agent in their home folder. Then start again from here.
+2. **Check for Node now, before you write a word of the manual.** Run `node --version`. Anything 18 or newer means the toolchain in Step 5b will install, and Step 3d writes the manual that uses it. If Node is missing, note that and carry it through: Step 3d has a by-hand variant of three sections, and Step 5b has a shorter install. Finding this out here costs one command; finding it out in Step 5b means rewriting the manual you already wrote.
+3. Write `.gitignore` **first**, before any other file touches disk:
    ```
    .DS_Store
    *.log
@@ -32,7 +35,7 @@ leave the structure half-built.
    .claude/settings.local.json
    ```
    This ordering matters: the first commit must never be able to leak a secret.
-3. Create the agent's filesystem-access config (e.g. `.claude/settings.json`) with a placeholder path for wherever the user's real project code lives. Do not hardcode a personal path you haven't confirmed:
+4. Create the agent's filesystem-access config (e.g. `.claude/settings.json`) with a placeholder path for wherever the user's real project files live, code or otherwise. Do not hardcode a personal path you haven't confirmed:
    ```json
    {
      "permissions": {
@@ -40,7 +43,7 @@ leave the structure half-built.
      }
    }
    ```
-   This is a placeholder. Step 1 confirms the real path(s), and Step 1's final instruction has you come back and edit this file. If the user's code lives in more than one root (e.g. a personal folder and a separate work folder), list all of them in the array. Do not leave the `~/Workspace` placeholder in the shipped repo.
+   This is a placeholder. Step 1 confirms the real path(s), and Step 1's final instruction has you come back and edit this file. If their work lives in more than one root (e.g. a personal folder and a separate client folder), list all of them in the array. Do not leave the `~/Workspace` placeholder in the shipped repo.
 
 ---
 
@@ -82,8 +85,8 @@ sure that by the end, from sources or from the user, you have all of this:
 - What they do (work, role, or life context) in their own words.
 - 1–2 things they're actively focused on right now.
 
-**Projects & code**
-- Where does their real project/code work live on disk? (This becomes `MAP.md` and the access path in `.claude/settings.json`.)
+**Projects & where the work lives**
+- Where do the files for their real projects live on disk? A code folder, a manuscripts folder, a client folder, a synced Drive folder on disk, whatever they actually open. (This becomes `MAP.md` and the access path in `.claude/settings.json`.)
 - For each active project: name, one-line description, status (active/dormant/reference).
 
 **People & entities worth knowing upfront**
@@ -101,12 +104,12 @@ sure that by the end, from sources or from the user, you have all of this:
   - Anything sensitive (health, finances, legal) that needs special handling.
 
 **Memory logistics**
-- Confirm where their real project code lives (used to finalize `.claude/settings.json` and `MAP.md`).
+- Confirm the folder(s) their project files live in (used to finalize `.claude/settings.json` and `MAP.md`).
 - Ask whether they want this synced to a git remote. If yes, the remote **must be private**. This repo will hold personal, and possibly sensitive, information about them. Create it explicitly private, e.g. `gh repo create <name> --private --source . --remote origin`, or create a private repo in the GitHub UI and `git remote add origin <url>`. Never push this to a public remote. If the user isn't comfortable with git or GitHub, walk them through the hand-held path in `guides/your-hq-everywhere.md`, and verify the `Private` badge together before the first push.
 - **No GitHub account?** Don't derail the interview to create one. Note sync as deferred, finish the bootstrap local-only (skip the push in Step 6), and point them at the "what GitHub is" section of `guides/your-hq-everywhere.md` for when they're ready. A local-only HQ is fully functional; it just isn't backed up or reachable from other devices yet.
 
 **Before leaving Step 1, do these now, don't defer:**
-- Edit `.claude/settings.json` and replace the `~/Workspace` placeholder with the real code path(s) you just confirmed. Add multiple array entries if the code lives in more than one root. A wrong or placeholder path here means future sessions silently can't read their project files.
+- Edit `.claude/settings.json` and replace the `~/Workspace` placeholder with the real path(s) you just confirmed. Add multiple array entries if their work lives in more than one root. A wrong or placeholder path here means future sessions silently can't read their project files.
 
 Do not proceed to Step 2 until you have real answers, even partial ones, to every section above. Write down verbatim quotes where useful. They're better raw material for `SOUL.md`/`USER.md` than your paraphrase.
 
@@ -123,7 +126,9 @@ hq/
 ├── TASKS.md
 ├── .gitignore
 ├── .claude/
-│   └── settings.json
+│   ├── settings.json
+│   └── skills/
+│       └── session-wrap -> ../../skills/session-wrap
 ├── .codex/
 │   └── hooks.json
 ├── hooks/
@@ -152,7 +157,13 @@ hq/
 ```
 
 `hooks/`, `.codex/`, and the two files in `scripts/` arrive in Step 5b, which fetches them
-from the starter repo. Create the rest now.
+from the starter repo. The `.claude/skills/session-wrap` symlink arrives in Step 5, with the
+skill it points at. Create the rest now.
+
+Skills live in `skills/` because that is where a person looks for them, and Claude Code reads
+project skills from `.claude/skills/` only, so the symlink is what makes the folder both
+readable and discoverable. Claude Code follows a symlink there and reads `SKILL.md` from the
+target ([skills docs](https://code.claude.com/docs/en/skills)).
 
 **Which filename for the operating manual?** You already know which CLI you are. If you're Claude Code, the canonical file is `CLAUDE.md`; if you're Codex or another CLI, it's `AGENTS.md`. Write the full manual under your own canonical name, and add a one-line stub at the other so a different agent still finds it later: e.g. `AGENTS.md` → `See CLAUDE.md, same file, read by both agents.` (or vice versa). Never maintain two diverging copies of the same manual. Only ask the user which CLI(s) to support if you genuinely can't tell.
 
@@ -163,6 +174,8 @@ Create every directory now, even ones that start empty (`vault/archives/`, `vaul
 ## Step 3: Write the core files
 
 Write these in this order, because each later one references the earlier ones by name. Show each back to the user for correction before treating it as settled. These are living documents, not one-shot outputs.
+
+**Every `{{...}}` in the templates below is a slot you fill, and none of them may survive into a written file.** `{{name}}` becomes the user's name everywhere it appears, `{{tz}}` becomes the timezone, a `{{describe the thing}}` slot becomes the thing described. Grep the finished HQ for `{{` before Step 6; a template brace left in a file is a placeholder a future session will read as content.
 
 ### 3a. `SOUL.md`: the agent's own voice/identity
 
@@ -229,17 +242,19 @@ even though I don't remember writing it.
 - {{Company}}: {{relationship, one line}} → see vault/areas/{{...}}
 
 ## Where the work lives
-- Project code: {{path, e.g. ~/Workspace/Personal, ~/Workspace/Client}}, see MAP.md
+- Project files: {{path, e.g. ~/Workspace, ~/Documents/Clients}}, see MAP.md
 ```
 
 Flag anything time-sensitive with `(confirm)` rather than asserting it as settled: e.g. `Reports to {{X}} (confirm, as of {{date}})`.
+
+**Only write a `→ see vault/...` pointer for an entity you actually create in Step 4e.** Names the user mentioned still belong in these lists; a name gets the pointer once the folder behind it exists. A link to a folder that was never made sends every future session on a lookup that returns nothing, and it's indistinguishable from a vault that lost a file. Add the pointer later, when the entity is created.
 
 ### 3c. `MAP.md`: index of active work
 
 ```markdown
 # MAP: {{name}}'s active projects
 
-Code and project files live outside this repo. This is the pointer index.
+Project files live outside this repo, code or otherwise. This is the pointer index.
 
 ## Active
 | Project | Location | Description |
@@ -257,10 +272,11 @@ Code and project files live outside this repo. This is the pointer index.
 
 Update this only when a project's status actually changes, not on every session.
 
-Optional, for later, power users only: once sessions are repeatedly launching the same dev
-servers, a `.claude/launch.json` (one entry per project: name, command, args, port) gives
-every future session a registry of how to run each one instead of rediscovering it. Don't
-create it at bootstrap; add it when the relaunching pattern actually appears.
+Optional, for later, and only when the projects are software: once sessions are repeatedly
+launching the same dev servers, a `.claude/launch.json` (one entry per project: name, command,
+args, port) gives every future session a registry of how to run each one instead of
+rediscovering it. Don't create it at bootstrap; add it when the relaunching pattern actually
+appears.
 
 ### 3d. `CLAUDE.md` / `AGENTS.md`: the operating manual (written last, references the above)
 
@@ -281,9 +297,10 @@ being asked to have read them.
 `vault/index.md` and the entities under it stay on demand: open the index when you need
 entity context, then grep. Don't announce any of this, just be oriented.
 
-**If the hook did not run** (an agent without hooks, a web session, a machine where the
-install was skipped), do it by hand as the first thing you do: `git pull`, then read
-`SOUL.md` → `USER.md` → `MAP.md` → the newest file in `memory/`.
+**If the hook did not run** (an agent without hooks, a web or Cowork session, a machine where
+the install was skipped), do it by hand as the first thing you do: `git pull`, then read
+`SOUL.md` → `USER.md` → `MAP.md` → the newest file in `memory/`. The tell is simple: if none
+of those files are already in front of you, the hook didn't run.
 
 ## What this workspace is for
 1. Memory: persist context across sessions (see Memory model below).
@@ -318,16 +335,32 @@ people, companies, recurring commitments), `resources/` (reference topics),
 there is one description of a fact and the manual cannot drift from it.
 
 ```bash
-node scripts/hq.mjs note "Runs the Tuesday standup" --entity dana --category role
-node scripts/hq.mjs note "Decided to bill monthly rather than per project"
-node scripts/hq.mjs note "Wants the number before the explanation" --user
-node scripts/hq.mjs note supersede dana-004 --with "Runs the Thursday standup"
+node scripts/hq.mjs note "{{a durable fact about them}}" --entity {{person}} --category role
+node scripts/hq.mjs note "{{a decision, and why it went that way}}"
+node scripts/hq.mjs note "{{a working habit worth remembering}}" --user
+node scripts/hq.mjs note "{{a fact that involves both}}" --entity {{person}} --related {{project}}
+node scripts/hq.mjs note "{{a health, money, or legal fact}}" --entity {{person}} --privacy sensitive
+node scripts/hq.mjs note supersede {{person}}-002 --with "{{the corrected fact}}"
 ```
 
 Routing is a flag, never a judgment made fresh each time: `--entity` for a durable fact
 about a person, project, or company, `--user` for how {{name}} operates, neither for a
 timeline event or a decision. An `--entity` that only fuzzy-matches refuses the write and
 prints the candidates, so a typo can never quietly become a second entity.
+
+`--related` takes another entity and makes the vault a graph: the fact is filed once and
+found from both ends. `--privacy sensitive` marks health, financial, and legal facts, which
+carry the handling in SOUL.md → Hard lines. Both refuse the write when they can't resolve,
+so a wrong one costs nothing.
+
+**A new entity has to exist on disk before a fact can go into it.** `--entity` resolving
+only against real folders is what keeps a typo from opening a second one, so creating an
+entity is three deliberate steps:
+1. Pick the bucket (`vault/PARA_GUIDE.md` has the rule), then
+   `mkdir -p vault/<bucket>/<name>`, write `summary.md` with a few lines of current state,
+   and write `items.json` containing exactly `[]`.
+2. `node scripts/hq.mjs note "<the first fact>" --entity <name>`, which now resolves.
+3. `node scripts/hq.mjs index`, so `vault/index.md` lists it.
 
 - Default to capturing, don't ask. Capturing is internal work, never gated on permission.
 - "Mental notes" don't survive. If it matters past this session it goes through `hq note`.
@@ -339,12 +372,18 @@ prints the candidates, so a typo can never quietly become a second entity.
 **Dates come from `node scripts/hq.mjs now`.** It prints today, the time, and every derived
 date (yesterday, tomorrow, this week, in 30 days, end of month). Read one there rather than
 computing it, and write absolute dates: a cold reader weeks later cannot resolve "tomorrow."
+The time and zone it prints are the machine's, so a session on a cloud machine or on a laptop
+that travelled reports that machine's local time. When {{name}} is somewhere else, take the
+zone from them and say which one you used.
 
 ### Recalling memory: grep first
 No search index by design (yet).
 1. Start at `vault/index.md`. It is generated by `node scripts/hq.mjs index`, so it is never
-   missing an entity. Hand-edit only the Description column; regeneration preserves it and
-   rewrites everything else.
+   missing an entity. The first time the command sees an entity it derives the description
+   from the opening paragraph of that entity's `summary.md`; from then on it keeps whatever
+   the cell says. So a description is only worth writing by hand when the derived one reads
+   badly, and it survives every later run. Everything else in the file is rewritten, and a
+   row added by hand is rewritten away.
 2. Narrow by PARA bucket.
 3. Grep for specifics (`grep -ri "{{term}}" vault/`), read `summary.md` first, open
    `items.json` only for granular facts.
@@ -403,8 +442,9 @@ ignore the worktree: read, write, and commit against the real repo as normal. Re
 file's current state before editing it; another concurrent session may have changed it.
 
 ## Projects & file access
-Real project code lives outside this repo. See `MAP.md`. Read a project's own
-README/CLAUDE.md before working in it.
+{{name}}'s project files live outside this repo. See `MAP.md`. When a project is code, read
+its own README/CLAUDE.md before working in it. When it is anything else, read whatever plays
+that role there: the brief, the outline, the contract, the last draft.
 
 ## Repo hygiene
 Artifacts (screenshots, exports, generated files) never land in the repo root. If one
@@ -415,22 +455,47 @@ root stays what it is now: the manual, the identity files, MAP, TASKS, and nothi
 `skills/<name>/SKILL.md` defines a reusable capability. Build one when a recurring action
 shows up at least twice, not for one-off tasks.
 
+`session-wrap` ships with this HQ; run it on any "wrap up," "checkpoint," or "let's stop
+here" signal. Claude Code finds it as `/session-wrap` through `.claude/skills/session-wrap`,
+a symlink to the real folder. An agent that discovers skills elsewhere, or not at all, reads
+`skills/session-wrap/SKILL.md` and follows it directly. The path is the contract; the
+discovery mechanism is a convenience.
+
 ---
 *This manual is alive. Update it when the system changes.*
 ````
 
-**If Step 5b could not install the CLI** (no Node on the machine), the manual is written the
-same way with three substitutions, and you tell the user plainly that this HQ captures by
-hand until Node is installed:
+**The `{{person}}` and `{{project}}` slots in the Saving-memory examples take the names of
+entities seeded in Step 4e.** Decide those names here, use them in the examples, then check
+them again once 4e is done: every entity named in the manual has to be a folder that exists,
+and every fact id has to belong to it. An example naming someone who was never seeded teaches
+a future session a command that fails, and it reads exactly like a vault that lost a file.
+
+**If the Step 0 Node check came back empty**, the CLI won't install in Step 5b, so write the
+manual with these substitutions from the start and tell the user plainly that this HQ
+captures by hand until Node is installed:
 
 - "Saving memory" loses the commands and gains the manual routing: a durable fact is
   appended by hand to `vault/<entity>/items.json` as a new object following the schema in
   `vault/PARA_GUIDE.md`, with an `id` of `<entity-folder>-NNN` continuing that file's
   sequence; how {{name}} operates goes under `## Working style` in `USER.md`; everything
-  else goes to `memory/YYYY-MM-DD.md`.
-- The date rule becomes "read the date from the system, never compute one from memory."
+  else goes to `memory/YYYY-MM-DD.md`. Creating a new entity is the same three steps minus
+  the command: make the folder with `summary.md` and an `items.json` holding `[]`, write the
+  first fact into it by hand, add the index row.
+- The date rule becomes "read the date from the system (`date +%F`), never compute one from
+  memory."
 - `vault/index.md` becomes hand-maintained again: add the row when you create the entity, in
   the same commit, or the index and the vault drift apart.
+- The "Toolchain" line in "What this workspace is for" says what is true instead: capture is
+  by hand, and installing Node then rerunning Step 5b of the starter's `AGENTS.md` turns the
+  commands on.
+- `scripts/README.md` documents an empty folder otherwise, so replace its three-verb section
+  with one paragraph: the toolchain isn't installed, `hq.mjs` and `test.mjs` live in the
+  starter repo, and Node 18+ plus a rerun of Step 5b installs them. Keep the rest of the file,
+  the reasoning and the deferred list are still true.
+
+The hooks are pure shell and need no Node, so they install and register normally. A machine
+with no Node still gets its session context loaded and its prose nudge.
 
 **If Step 5b installed the CLI but the hooks could not be registered**, keep the manual's
 Startup section and lead with its fallback paragraph, so the reading still happens.
@@ -459,7 +524,9 @@ Durable facts get promoted out of here into `vault/` entities. Don't rely on old
 being re-read to reconstruct facts. If it's durable, it belongs in the vault too.
 ```
 
-Create today's file with a minimal header so the pattern exists:
+Create today's file with a minimal header so the pattern exists. **Get today's date from the
+machine first: `date +%F`.** The CLI that normally answers this arrives in Step 5b, and a date
+recalled rather than read is how a memory file ends up filed under the wrong day.
 ```markdown
 # YYYY-MM-DD
 
@@ -568,9 +635,10 @@ Never delete a fact. Correct forward: add a new entry, mark the old one supersed
 ### 4c. `vault/index.md`: the master table of contents
 
 Write the shape below now, as a placeholder with empty tables. From Step 5b onward the rows
-come from `node scripts/hq.mjs index`, which walks the vault and rewrites everything except
-the Description column. Descriptions are hand-written and preserved across regenerations,
-so a good one-liner survives; a hand-added row does not.
+come from `node scripts/hq.mjs index`, which walks the vault and rewrites the file. A new
+entity's description is derived from the opening paragraph of its `summary.md`, and whatever
+the cell holds after that is preserved on every later run, so a description written by hand
+survives. A row added by hand is rewritten away.
 
 ```markdown
 # vault/index.md: index of everything
@@ -632,10 +700,14 @@ From the Step 1 interview, create:
 Use only real information from the interview. Do not batch-generate placeholder entities to
 "fill out" the vault. An empty `vault/index.md` row is better than an invented one.
 
-Leave `vault/index.md` alone while you create these. Step 5b installs the CLI and runs
-`node scripts/hq.mjs index`, which finds every entity on disk and writes the rows. Then
-write a one-line description into each row by hand: that column is yours, and every future
-regeneration keeps it.
+**Each `summary.md` gets real prose now; each `items.json` gets exactly `[]`.** An empty
+array is a valid, complete fact log, and it is what the capture command appends to. Facts
+don't go in by hand here: Step 5b installs the CLI and captures them properly, with ids and
+validation. Open the summary with a sentence that says what this entity is, because the
+index derives that entity's description from it.
+
+Leave `vault/index.md` alone while you create these. Step 5b runs the index command, which
+finds every entity on disk and writes the rows.
 
 ---
 
@@ -661,9 +733,25 @@ Every HQ needs it from the first session, so it doesn't wait for recurrence.
 - Guardrails: known failure modes, especially over-application.
 ```
 
-**Install the session-wrap skill now.** Copy `templates/skills/session-wrap/SKILL.md` from
-this starter repo to `<hq>/skills/session-wrap/SKILL.md`, replacing every `{{name}}` with the
-user's name. This is the one skill that doesn't wait for a recurring need: the end-of-session
+**Install the session-wrap skill now, and make it discoverable.** Copy
+`templates/skills/session-wrap/SKILL.md` from this starter repo to
+`<hq>/skills/session-wrap/SKILL.md`, replacing every `{{name}}` with the user's name. Then,
+from the HQ root:
+
+```
+mkdir -p .claude/skills && ln -s ../../skills/session-wrap .claude/skills/session-wrap
+```
+
+Claude Code loads project skills from `.claude/skills/` and nowhere else, so a skill sitting
+only in `skills/` is a file nobody ever runs. It follows a symlink there and reads `SKILL.md`
+from the target, so the skill has one copy, lives where a person would look for it, and still
+shows up as `/session-wrap` ([skills docs](https://code.claude.com/docs/en/skills)). Two
+things worth knowing: the folder didn't exist when this session started, so Claude Code
+usually needs a restart before it appears in this session, and a Codex or other agent that
+looks somewhere else still reads `skills/session-wrap/SKILL.md` by path, which is why the
+manual names that path.
+
+This is the one skill that doesn't wait for a recurring need: the end-of-session
 checkpoint (log → promote facts → update tasks → flag stragglers → commit → push) is the
 mechanism that keeps memory and cross-machine sync intact, and it's needed from the very first
 session. It is the executable form of the Step 7 session-end procedure; any "wrap up" /
@@ -756,9 +844,9 @@ Still deferred. Do not build any of this until real use has proven it necessary:
 
 Two scripts and two hooks, fetched from the starter repo the same way the templates were.
 
-**1. Check for Node.** Run `node --version`. Anything 18 or newer works. If Node is missing,
-skip to "No Node on this machine" at the end of this step; don't try to install it during
-bootstrap.
+**1. Node.** Step 0 already ran `node --version`. If it came back 18 or newer, carry on. If it
+came back empty, skip to "No Node on this machine" at the end of this step; don't try to
+install Node during bootstrap.
 
 **2. Fetch the four files** (swap in the user's fork if they have one):
 
@@ -776,18 +864,28 @@ exactly like a hook that isn't registered.
 ```
 node scripts/test.mjs
 ```
-21 smoke tests against throwaway directories in `$TMPDIR`. They touch nothing in the HQ. If
+22 smoke tests against throwaway directories in `$TMPDIR`. They touch nothing in the HQ. If
 any fail, stop and fix it before wiring the hooks up; a capture tool that writes to the
 wrong place is worse than no tool.
 
-**4. Regenerate the index**, now that the Step 4e entities exist:
+**4. Put the interview's facts into the seeded entities.** The Step 4e entities have real
+summaries and empty fact logs, and this is where the logs get filled: one
+`node scripts/hq.mjs note "<fact>" --entity <name>` per durable thing the interview turned
+up about that person, project, or company. Aim for two or three each, atomic (a fact needing
+an "and" is two facts), with `--category` set and `--source conversation`. Use `--related`
+where a fact genuinely involves a second entity, and `--privacy sensitive` for anything
+health, financial, or legal. This is also the first proof the capture path works end to end
+on this machine.
+
+**5. Regenerate the index**, now that the Step 4e entities exist:
 ```
 node scripts/hq.mjs index
 ```
-Then write a one-line description into each row by hand. That column is preserved on every
-future regeneration.
+It derives each description from that entity's `summary.md`. Read the result, and rewrite a
+description by hand only where the derived one reads badly. Whatever the cell holds now is
+preserved on every future run.
 
-**5. Register the hooks for both agents.** Write both files regardless of which CLI you are,
+**6. Register the hooks for both agents.** Write both files regardless of which CLI you are,
 so the other one works when the user opens the HQ there.
 
 `.claude/settings.json` keeps the permissions block from Step 0 and gains `hooks`:
@@ -847,22 +945,54 @@ this, and register it wherever your version reads hooks from (`.codex/hooks.json
 `[hooks]` block in `config.toml`). The two shell scripts stay as they are either way: they
 read the payload from stdin and print to stdout, which both agents handle the same.
 
-**6. Tell the user the two things they have to do themselves.** Neither is something you can
-do for them:
+**7. Offer the `hq` alias.** Every doc writes `node scripts/hq.mjs <verb>`, which works
+from a cold start with nothing configured. For the user's own typing, offer this line for
+their shell profile (`~/.zshrc` on a Mac, `~/.bashrc` on most Linux), with the real path
+filled in:
+```
+alias hq='node <hq>/scripts/hq.mjs'
+```
+The script finds the HQ root from its own location, so `hq now` then works from any
+directory. Show them the line and let them add it, or add it on their say-so. The docs keep
+the long spelling either way: an alias lives in one person's shell, and the manual is read by
+agents on machines that have never seen it.
+
+**8. Tell the user the three things they have to do themselves.** None of these is something
+you can do for them:
 - **Codex asks for a one-time approval** the first time it sees a project hook, and it only
   offers that on a project it trusts. If they open the HQ in Codex and no context appears,
   the answer is usually "trust the project, then approve the hook."
+- **Claude Code asks them to trust the folder** before it registers hooks from a project's
+  `.claude/settings.json`. Same symptom, same shape of fix.
 - **Hooks run shell scripts from the repo.** Anyone who can write to this repo can run code
   on their machine at session start. That is fine for a private HQ they own alone and is the
   reason the remote has to be private.
 
-**No Node on this machine.** Skip the fetch, skip the hooks, and say so plainly: "Your HQ is
-set up, but this machine has no Node, so the capture commands aren't installed. Everything
-works by hand; it's a bit more typing and easier to get wrong." Then write the manual
-variants of the manual's Startup and Saving-memory sections (the substitutions are listed at
-the end of Step 3d), and leave `vault/index.md` hand-maintained. Node is present wherever
+**In Cowork, expect less of the machinery and none of the loss.** Cowork sessions load the
+skills enabled for the user's claude.ai account, and the docs describe project
+`.claude/skills/` loading for cloud sessions started from a cloned repository, without saying
+that a Cowork session does the same
+([skills docs](https://code.claude.com/docs/en/skills)). The hooks docs say cloud sessions
+take hooks from the repo rather than from local user settings, and say nothing about Cowork
+([hooks docs](https://code.claude.com/docs/en/hooks)). Cowork itself runs on Anthropic's
+servers, with sessions and files saved to the user's Claude account, and the desktop app
+reads and writes local folders it has been granted
+([Cowork docs](https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork)).
+What the docs don't settle is whether an HQ at `~/hq` is reachable from a given Cowork
+session, or whether that session runs this repo's hooks. So tell the user the honest version:
+in Cowork, grant the HQ folder when asked, and if the session opens without their files in
+front of it, say "read AGENTS.md and follow the startup protocol." The manual's Startup
+section carries that fallback for exactly this case, and every file stays readable by hand
+whatever the harness does or doesn't run.
+
+**No Node on this machine.** Fetch the two hooks and register them as normal, they are plain
+shell and need nothing installed. Skip only `hq.mjs` and `test.mjs`, and say so plainly:
+"Your HQ is set up, and this machine has no Node, so the capture commands aren't installed.
+Everything works by hand; it's a bit more typing and easier to get wrong." The manual should
+already carry the by-hand variants from Step 3d, since Step 0 knew about Node before the
+manual was written; check them now against what actually installed. Node is present wherever
 Claude Code runs, so this mostly comes up on a bare Codex install. Installing Node later and
-rerunning this step is a five-minute job and nothing has to be rewritten except those three
+rerunning this step is a five-minute job, and nothing has to be rewritten except those
 sections.
 
 ---
@@ -887,10 +1017,26 @@ sections.
    - Who are the key people/companies, and what's the relationship?
    - What tone/hard lines govern how you should act?
 
-   Then confirm the toolchain works from a cold start:
+   Then confirm the machinery works from a cold start. Run each of these, don't assume any
+   of them:
    - `node scripts/hq.mjs now` prints today's real date and its derived dates.
    - `node scripts/hq.mjs index` runs clean and reports the entity count you expect. Run it
-     twice: the second run must not change the descriptions you wrote.
+     twice: the second run must not change the descriptions.
+   - **Capture lands.** Take one real fact from the interview that hasn't been recorded yet
+     and write it: `node scripts/hq.mjs note "<fact>" --entity <a seeded entity>`. The
+     command re-reads the file and prints the id back. Use a real fact rather than a test
+     one, because nothing here is deleted afterwards.
+   - **File access resolves.** `cat .claude/settings.json`, then `ls` the path in
+     `additionalDirectories`. A path that doesn't list means future sessions can't read
+     {{name}}'s project files, and nothing announces that at the time.
+   - **The wrap skill is discoverable.** `ls -l .claude/skills/session-wrap/SKILL.md` follows
+     the symlink and finds the file. In Claude Code, `/session-wrap` should also be offered;
+     if it isn't, restart the session once, since the folder didn't exist when the earlier
+     one started.
+   - **The prose hook speaks.** Pipe it a payload by hand:
+     `echo '{"session_id":"cold-boot","tool_input":{"file_path":"/tmp/draft-check.md"}}' | ./hooks/prose-style-nudge.sh`
+     It must print one line of JSON containing `additionalContext`. Silence means it is
+     inert, and an inert PostToolUse hook looks exactly like a working one from the outside.
 
    If any answer required guessing or came out wrong, fix the source file now, before anyone
    relies on this system for real work.

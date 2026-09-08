@@ -53,13 +53,14 @@ If a machine sat unwrapped for days and things feel forked, the instruction is t
 
 Once HQ is on GitHub, you can open it with Claude Code on the web (claude.ai/code) from any browser, including the mobile app. That's the closest thing to the companion-in-your-pocket experience: same memory, same voice, from wherever you are.
 
-Two things to know about cloud sessions:
+Three things to know about cloud sessions:
 
 - **They start from what was pushed.** A cloud session clones your repo fresh, so it knows exactly as much as your last push. Push discipline is what makes your phone as informed as your laptop.
-- **They should wrap too.** End cloud sessions with the same "wrap up" so their work is pushed back and your laptop picks it up next pull.
+- **They work on a side branch unless told otherwise.** Claude Code on the web starts every session on its own branch, named `claude/<something>`, and its built-in instructions say to push there and to stay off other branches without explicit permission. Your laptop's session-start pull reads `main` only. So a note written from your phone and wrapped with the defaults lands on that side branch and is invisible on the laptop until someone goes looking. The operating manual template carries a standing line granting that permission for `main` (see below), and the session-wrap skill lands the wrap on `main` and removes the side branch. If a cloud session still ends up on a branch, saying "push this to main" in the session does it: a fast-forward, nothing left behind.
+- **They should wrap too.** End cloud sessions with the same "wrap up" so their work reaches `main` and your laptop picks it up next pull. If a session forgot, the laptop's session-start hook lists any `claude/` branch on the remote that `main` doesn't have yet, and the agent can merge it in.
 
 Cloud access is also what makes the truly unattended morning briefing possible; see the scheduling section of [proactive.md](proactive.md).
 
 ## A note that belongs in your operating manual
 
-Your `CLAUDE.md`/`AGENTS.md` template already carries a "syncing and concurrent sessions" section covering two agent-facing rules: if a session gets spawned into an isolated git worktree, operate against the real repo as normal; and re-read a file before editing it, because a concurrent session may have changed it. If your HQ was bootstrapped before that section existed, ask the agent to add it.
+Your `CLAUDE.md`/`AGENTS.md` template already carries a "syncing and concurrent sessions" section covering three agent-facing rules: a cloud session has standing permission to push its work to `main` rather than leaving it on a `claude/` branch; if a session gets spawned into an isolated git worktree, operate against the real repo as normal; and re-read a file before editing it, because a concurrent session may have changed it. If your HQ was bootstrapped before that section existed, ask the agent to add it.

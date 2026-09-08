@@ -45,7 +45,8 @@ Write for a cold reader. The next session has no context. A good wrap leaves a r
 
 7. **Regenerate the index if the vault grew.** `node scripts/hq.mjs index` after any session that created an entity, so `vault/index.md` lists it. The command preserves the hand-written descriptions; write one for each new row before committing.
 
-8. **Commit and push.** From the HQ root: `git add -A`, commit with a session-checkpoint message (`Session wrap: {{one-line summary}}`; this convention makes `git log` a readable session index for free), then push. If the push is rejected, `git pull --rebase` and retry. Never commit secrets; they don't belong in HQ at all.
+8. **Commit and push to `main`.** From the HQ root: `git add -A`, commit with a session-checkpoint message (`Session wrap: {{one-line summary}}`; this convention makes `git log` a readable session index for free), then push. If the push is rejected, `git pull --rebase` and retry. Never commit secrets; they don't belong in HQ at all.
+   The wrap only counts once it is on `main`; every other machine pulls `main` and nothing else. Check first with `git rev-parse --abbrev-ref HEAD`. A cloud session (Claude Code on the web) starts on a `claude/<name>` branch, and the operating manual grants standing permission to leave it: `git fetch origin main`, `git rebase origin/main`, `git push origin HEAD:main`, then `git push origin --delete <branch>` if the side branch reached the remote. A wrap left on a side branch is lost to the laptop.
 
 ## Output format
 

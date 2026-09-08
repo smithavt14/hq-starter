@@ -438,6 +438,11 @@ as a tell in prose.
 This repo may be opened from another machine, Claude Code on the web, or a phone. The
 startup `git pull` and the end-of-session push are what keep all of them coherent; never
 skip either. If a push is rejected, `git pull --rebase` and retry.
+`main` is the only branch this repo uses. A cloud session (Claude Code on the web) starts on
+a `claude/<name>` branch and is told to stay there without explicit permission: this line is
+that permission, standing. Land every commit on `main` (`git fetch origin main`, rebase onto
+it, `git push origin HEAD:main`) and delete the `claude/` branch from the remote if it was
+pushed. Work left on a side branch is invisible to every other machine.
 If a session is ever spawned into an isolated git worktree (`.claude/worktrees/<name>`),
 ignore the worktree: read, write, and commit against the real repo as normal. Re-read a
 file's current state before editing it; another concurrent session may have changed it.

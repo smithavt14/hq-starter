@@ -272,6 +272,18 @@ test('index picks up an entity added after the last run', (root) => {
   assert(/\*\*Stats:\*\* 5 entities/.test(text), 'the count did not update');
 });
 
+test('index ignores documents inside an entity files/ folder', (root) => {
+  mkdirSync(join(root, 'vault/projects/atlas/files'), { recursive: true });
+  writeFileSync(join(root, 'vault/projects/atlas/files/kickoff-notes.md'), '# Kickoff\n\nRaw notes.\n');
+  writeFileSync(join(root, 'vault/projects/atlas/files/contract.md'), '# Contract\n');
+  run(root, ['index']);
+  const text = read(root, 'vault/index.md');
+  assert(!text.includes('kickoff-notes'), 'a document in files/ was indexed as an entity');
+  assert(/\*\*Stats:\*\* 4 entities/.test(text), 'files/ documents inflated the count');
+  const r = run(root, ['note', 'A fact', '--entity', 'kickoff-notes']);
+  assert(r.code !== 0, 'a files/ document was accepted as an --entity target');
+});
+
 // vault/resources/memory-architecture.md, seeded by the bootstrap, opens with a
 // lead-in that ends in a colon. Derived verbatim it becomes a description that
 // stops mid-thought.

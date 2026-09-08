@@ -19,7 +19,7 @@
 import {
   existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync,
 } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -103,11 +103,14 @@ function cmdNow() {
 // ------------------------------------------------------------------- entities
 
 // An entity is a folder under vault/ carrying summary.md or items.json, or a
-// bare .md file sitting directly in a bucket.
+// bare .md file sitting directly in a bucket. An entity's files/ folder holds
+// its artifacts (exports, screenshots, source documents); nothing in there is
+// an entity, however many .md files it has.
 function allEntities() {
   const out = [];
   const scan = (dir, depth) => {
     if (!existsSync(dir)) return;
+    if (basename(dir) === 'files') return;
     for (const name of readdirSync(dir).sort()) {
       if (name.startsWith('.')) continue;
       const p = join(dir, name);

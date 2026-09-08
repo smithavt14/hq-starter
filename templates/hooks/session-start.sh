@@ -20,13 +20,6 @@ cd "$ROOT" 2>/dev/null || exit 0
 # Quiet and non-fatal, since plenty of HQs have no remote at all.
 git pull -q --no-rebase --autostash 2>/dev/null
 
-# A cloud session (Claude Code on the web) that wrapped without landing on main
-# leaves its work on a claude/<name> branch, which the pull above never sees.
-# Name any such branch so the agent can merge it in rather than miss it.
-git fetch -q --prune origin 2>/dev/null
-stray=$(git branch -r --no-merged HEAD 2>/dev/null | grep 'origin/claude/' | sed 's/^ *//')
-[ -n "$stray" ] && printf '\nRemote branches with commits not on this branch (cloud sessions that never landed on main; merge them in):\n%s\n' "$stray"
-
 emit() { [ -n "$1" ] && [ -f "$1" ] && { printf '\n===== %s =====\n' "$1"; cat "$1"; }; }
 
 emit SOUL.md

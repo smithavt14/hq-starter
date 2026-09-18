@@ -27,7 +27,7 @@ Write for a cold reader. The next session has no context. A good wrap leaves a r
 
 ## Workflow
 
-1. **`git pull --rebase` first.** HQ syncs across machines and sessions via the remote; start the wrap from latest so the push doesn't get rejected. (No remote set up? Skip this and step 8's push, and just commit locally.)
+1. **`git pull --rebase` first.** HQ syncs across machines and sessions via the remote; start the wrap from latest so the push doesn't get rejected. If the pull stops on a conflict, resolve it before doing anything else: where both sides added notes, keep both. (No remote set up? Skip this and step 8's push, and just commit locally.)
 
 2. **Log to `memory/YYYY-MM-DD.md`.** `node scripts/hq.mjs note "<what happened>"` appends to today's file; writing by hand works too, as long as it appends. Capture: what happened, every decision made *and why*, dead ends (so they aren't retried), and the pause point: exactly where work stopped and the next concrete action. Reference file paths, not vibes.
 
@@ -45,7 +45,7 @@ Write for a cold reader. The next session has no context. A good wrap leaves a r
 
 7. **Regenerate the index if the vault grew.** `node scripts/hq.mjs index` after any session that created an entity, so `vault/index.md` lists it. The command preserves the hand-written descriptions; write one for each new row before committing.
 
-8. **Commit and push to `main`.** From the HQ root: `git add -A`, commit with a session-checkpoint message (`Session wrap: {{one-line summary}}`; this convention makes `git log` a readable session index for free), then push. If the push is rejected, `git pull --rebase` and retry. Never commit secrets; they don't belong in HQ at all.
+8. **Commit and push to `main`.** From the HQ root, first confirm no file still carries a conflict marker (`grep -rl '^<<<<<<<' . --exclude-dir=.git` prints nothing); a marker committed as content is the one mistake git will not catch for you. Then `git add -A`, commit with a session-checkpoint message (`Session wrap: {{one-line summary}}`; this convention makes `git log` a readable session index for free), then push. If the push is rejected, `git pull --rebase` and retry. Never commit secrets; they don't belong in HQ at all.
    The wrap only counts once it is on `main`; every other machine pulls `main` and nothing else. Check first with `git rev-parse --abbrev-ref HEAD`. A cloud session (Claude Code on the web) starts on a `claude/<name>` branch, and the operating manual grants standing permission to leave it: `git fetch origin main`, `git rebase origin/main`, `git push origin HEAD:main`, then `git push origin --delete <branch>` if the side branch reached the remote. A wrap left on a side branch is lost to the laptop.
 
 ## Output format

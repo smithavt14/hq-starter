@@ -17,8 +17,17 @@ ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
 cd "$ROOT" 2>/dev/null || exit 0
 
 # Start from latest: HQ syncs across machines and sessions through the remote.
-# Quiet and non-fatal, since plenty of HQs have no remote at all.
-git pull -q --no-rebase --autostash 2>/dev/null
+# Fast-forward only, and silent when there is no remote at all. The
+# `pull --autostash` this replaced could leave conflict markers inside files
+# with exit 0 and no output, so an HQ wedged mid-merge looked like a normal
+# morning (found 2026-09-18). A fast-forward cannot write a marker. When it
+# cannot fast-forward, it says so in one line, and the ask that fixes it is
+# in the line.
+if git rev-parse --abbrev-ref '@{u}' >/dev/null 2>&1; then
+  git fetch -q 2>/dev/null
+  git merge -q --ff-only '@{u}' >/dev/null 2>&1 ||
+    printf '\n===== git =====\nHQ could not fast-forward to the remote (local and remote both changed). Ask: "pull and merge whatever diverged, keep both sides, then push."\n'
+fi
 
 # A cloud session (Claude Code on the web) that wrapped without landing on main
 # leaves its work on a claude/<name> branch, which the pull above never sees.
